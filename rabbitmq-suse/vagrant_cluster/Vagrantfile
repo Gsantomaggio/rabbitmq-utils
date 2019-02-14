@@ -50,7 +50,7 @@ EOF
      sudo systemctl enable rabbitmq-server
      sudo systemctl start rabbitmq-server
      sudo chmod 600 /var/lib/rabbitmq/.erlang.cookie
-     sudo echo "MYCOOKIE" > /var/lib/rabbitmq/.erlang.cookie
+     sudo echo "PLEASE_GENERATE_A_SECURE_VALUE" > /var/lib/rabbitmq/.erlang.cookie
      sudo bash -c  'echo "vm_memory_high_watermark.relative = 0.9" > /etc/rabbitmq/rabbitmq.conf'
      sudo bash -c  'echo "cluster_partition_handling = pause_minority" >> /etc/rabbitmq/rabbitmq.conf'
      sudo systemctl restart rabbitmq-server

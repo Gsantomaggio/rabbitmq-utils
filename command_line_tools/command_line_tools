@@ -1,0 +1,32 @@
+######################### QUEUES ###########################################
+
+#### Identify queues with messages > 0 
+rabbitmqctl list_queues --no-table-headers -q | awk '$2 > 0 { printf "%s\t%s\n", $0,"[X]" ; } $2 <= 0  { print $0 ;}'
+
+#### filter queues with messages > 0
+rabbitmqctl list_queues --no-table-headers -q | awk '$2 > 0 { printf "%s\t%s\n", $0,"" ; }'
+
+### filter and sort messages with messages > 0 
+rabbitmqctl list_queues --no-table-headers -q |  sort  -k2 -n  |awk '$2 > 0 { printf "%s\t%s\n", $0,"" ; }'
+
+### filter and sort messages with messages > 0 reverse 
+rabbitmqctl list_queues --no-table-headers -q |  sort -r  -k2 -n  |awk '$2 > 0 { printf "%s\t%s\n", $0,"" ; }'
+
+### filter queue name starting with
+rabbitmqctl list_queues --no-table-headers -q |  sort -r -k1 -n  |awk '/^PUTSTARTINGNAMEHERE/'
+
+### filter queue name contain name
+rabbitmqctl list_queues --no-table-headers -q |  sort -r -k1 -n  |awk '/PUTSUBSTRINGHERE/'
+
+### filter queues with consumers 
+rabbitmqctl list_queues name messages consumers --no-table-headers -q | awk '$3 > 0 { printf "%s\t%s\n", $0,"" ; }'
+
+
+################# CHANNLES #################
+
+### filter and sort channels with conumers > 0
+rabbitmqctl list_channels name connection number consumer_count --no-table-headers -q  |  sort -r  -k1 -n  |awk '$7 > 0 { printf "%s\t%s\n", $0,"" ; }'
+
+#### filter channels with ZERO consumers
+rabbitmqctl list_channels name connection number consumer_count  --no-table-headers -q  |awk '$7 = 0 { printf "%s\t%s\n", $0,"" ; }'
+

@@ -43,11 +43,11 @@ def call(transport, target, number):
                 e.exception, e.routing_key, e.message.body, e.exchange))
 
 
-@retry(retry=retry_if_exception_type(MessageUndeliverable))
+@retry(retry=retry_if_exception_type(exceptions.MessageUndeliverable))
 def call_and_retry(transport, target, number):
     """publish data and retry by using tenacity if the message is undeliverable"""
     client = oslo_messaging.RPCClient(transport, target, options={'mandatory': True})
-    r = client.call({}, 'foo', id_value=str(i), test_value="hello oslo")
+    r = client.call({}, 'foo', id_value="Retry", test_value="hello oslo")
     print("hello" + r + " - number: " + str(number))
 
 

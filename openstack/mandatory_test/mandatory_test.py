@@ -4,6 +4,7 @@ from oslo_messaging import exceptions
 import _thread
 import time
 import threading
+from tenacity import *
 
 
 class TestEndpoint(object):
@@ -42,12 +43,21 @@ def call(transport, target, number):
                 e.exception, e.routing_key, e.message.body, e.exchange))
 
 
+@retry(retry=retry_if_exception_type(MessageUndeliverable))
+def call_and_retry(transport, target, number):
+    """publish data and retry by using tenacity if the message is undeliverable"""
+    client = oslo_messaging.RPCClient(transport, target, options={'mandatory': True})
+    r = client.call({}, 'foo', id_value=str(i), test_value="hello oslo")
+    print("hello" + r + " - number: " + str(number))
+
+
 def start_client():
     oslo_messaging.set_transport_defaults('myexchange')
     transport = oslo_messaging.get_transport(cfg.CONF)
     target = oslo_messaging.Target(topic='myroutingkey', version='2.0',
                                    namespace='test')
     _thread.start_new_thread(call, (transport, target, 1,))
+    _thread.start_new_thread(call_and_retry, (transport, target, 1,))
     # _thread.start_new_thread(call, (transport, target, 2,))
     # _thread.start_new_thread(call, (transport, target, 3,))
     # _thread.start_new_thread(call, (transport, target, 4,))

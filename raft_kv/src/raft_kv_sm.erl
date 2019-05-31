@@ -11,50 +11,36 @@
 -author("gabriele").
 
 
--opaque state() :: #{term() => term()}.
-
--type ra_kv_command() :: {write, Key :: term(), Value :: term()} |
-{read, Key :: term()}.
 %% API
--export([init/1, apply/3]).
+-export([init/1, apply/3, write/3, read/2, start_cluster/2, members/0,
+  members/1, start_local_server/2, start_and_join/2]).
 
-init(_Config) -> #{}.
+-record(?MODULE, {kvstore = #{} :: map()}).
 
 
+init(_) ->
+  #?MODULE{}.
 
-apply(_Meta, {write, Key, Value},
-    #?MODULE{value = Value} = State) ->
-  %% no change
-  {State, ok, []};
-apply(#{index := Idx}, {put, Value},
-    #?MODULE{watchers = Watchers, value = OldValue} = State0) ->
+
+apply(_Meta, {write, Key, Value}, #?MODULE{kvstore = KvM} = State) ->
+  KvM0 = maps:put(Key, Value, KvM),
+  {State#?MODULE{kvstore = KvM0}, ok, []};
+apply(_Meta, {read, Key}, #?MODULE{kvstore = KvM} = State) ->
+  Reply = maps:get(Key, KvM, undefined),
+  {State, Reply, []};
+apply(#{index := Idx}, _, State) ->
   %% notify all watchers of the change of value
-  Effects0 = maps:fold(
-    fun(P, _, Acc) ->
-      [{send_msg, P, {refcell_changed, OldValue, Value}}
-        | Acc]
-    end, [], Watchers),
-  State = State0#?MODULE{value = Value},
-  %% emit a release cursor effect every 1000 commands or so
-  %% (give or take the number of non state machine commands that ra
-  %% processes
   Effects = case Idx rem 1000 of
-              0 -> [{release_cursor, Idx, State} | Effects0];
-              _ -> Effects0
+              0 -> [{release_cursor, Idx, State}];
+              _ -> []
             end,
   {State, ok, Effects};
-apply(_Meta, {write, Key, Value}, State) ->
-  {maps:put(Key, Value, State), ok, Effects};
-apply(_Meta, {read, Key}, State) ->
-  Reply = maps:get(Key, State, undefined),
-  {State, Reply, Effects}.
+apply(_Meta, {nodedown, _}, State) ->
+  %% we need to handle the nodedown as well to avoid crashing
+  {State, ok, []}.
 
 
-
-write(Key, Value) ->
-  %% it would make sense to cache this to avoid redirection costs when this
-  %% server happens not to be the current leader
-  Server = ra_kv1,
+write(Server, Key, Value) ->
   case ra:process_command(Server, {write, Key, Value}) of
     {ok, _, _} ->
       ok;
@@ -62,11 +48,35 @@ write(Key, Value) ->
       Err
   end.
 
-read(Key) ->
-  Server = ra_kv1,
+read(Server, Key) ->
   case ra:process_command(Server, {read, Key}) of
     {ok, Value, _} ->
       {ok, Value};
     Err ->
       Err
+  end.
+
+start_cluster(Name, Node) ->
+  ra:start_cluster(Name, {module, ?MODULE, #{}}, [{kv, Node}]).
+
+start_local_server(Name, Node) ->
+  ra:start_server(Name, {kv, Node}, {module, ?MODULE, #{}}, []),
+  ok = ra:trigger_election({kv, Node}).
+
+
+start_and_join(Name, New) ->
+  ServerRef = {kv, node()},
+  {ok, _, _} = ra:add_member(ServerRef, {kv, New}),
+  ok = ra:start_server(Name, {kv, New}, {module, ?MODULE, #{}}, [ServerRef]),
+  ok.
+
+
+members() ->
+  members(node()).
+
+members(Node) ->
+  case ra:members({kv, Node}) of
+    {ok, Result, Leader} -> io:format("Cluster Members:~nLeader:~p~nFollowers:~p~n" ++
+    "Nodes:~p~n", [Leader, lists:delete(Leader, Result), Result]);
+    Err -> io:format("Cluster Status error: ~p", [Err])
   end.

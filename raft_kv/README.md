@@ -1,6 +1,6 @@
 # Distributed KV with RabbitMQ Raft Library
 
-This is a reference Key Value example based on [Ra](https://github.com/rabbitmq/ra).
+This is a Distributed Key Value example based on [Ra](https://github.com/rabbitmq/ra).
 
 ## Compiling
 

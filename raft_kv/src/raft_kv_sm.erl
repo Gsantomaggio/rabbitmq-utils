@@ -13,7 +13,7 @@
 
 %% API
 -export([init/1, apply/3, write/3, read/2, start_cluster/2, members/0,
-  members/1, start_local_server/2, start_and_join/2]).
+  members/1, start_local_server/2, start_and_join/2, restart_node/1, members_flat/1, get_map/1]).
 
 -record(?MODULE, {kvstore = #{} :: map()}).
 
@@ -27,6 +27,9 @@ apply(_Meta, {write, Key, Value}, #?MODULE{kvstore = KvM} = State) ->
   {State#?MODULE{kvstore = KvM0}, ok, []};
 apply(_Meta, {read, Key}, #?MODULE{kvstore = KvM} = State) ->
   Reply = maps:get(Key, KvM, undefined),
+  {State, Reply, []};
+apply(_Meta, {get_map}, #?MODULE{kvstore = KvM} = State) ->
+  Reply = maps:to_list(KvM),
   {State, Reply, []};
 apply(#{index := Idx}, _, State) ->
   %% notify all watchers of the change of value
@@ -56,6 +59,16 @@ read(Server, Key) ->
       Err
   end.
 
+get_map(Server) ->
+  case ra:process_command(Server, {get_map}) of
+    {ok, Value, _} ->
+      {ok, Value};
+    Err ->
+      Err
+  end.
+
+
+
 start_cluster(Name, Node) ->
   ra:start_cluster(Name, {module, ?MODULE, #{}}, [{kv, Node}]).
 
@@ -70,6 +83,8 @@ start_and_join(Name, New) ->
   ok = ra:start_server(Name, {kv, New}, {module, ?MODULE, #{}}, [ServerRef]),
   ok.
 
+restart_node(Node) ->
+  ra:restart_server({kv, Node}).
 
 members() ->
   members(node()).
@@ -79,4 +94,11 @@ members(Node) ->
     {ok, Result, Leader} -> io:format("Cluster Members:~nLeader:~p~nFollowers:~p~n" ++
     "Nodes:~p~n", [Leader, lists:delete(Leader, Result), Result]);
     Err -> io:format("Cluster Status error: ~p", [Err])
+  end.
+
+members_flat(Node) ->
+  case ra:members({kv, Node}) of
+    {ok, Result, Leader} ->
+      {Leader, lists:delete(Leader, Result), Result};
+    Err -> {error, Err}
   end.

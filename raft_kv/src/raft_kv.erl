@@ -14,7 +14,8 @@
 
 %% API
 -export([start_link/0, callback_mode/0, start_cluster/1,
-  members/0, start_local/0, join/1, get/1, put/2]).
+  members/0, start_local/0, join/1, get/1, put/2,
+  start_http/0, start_http/1]).
 
 %% gen_server callbacks
 -export([init/1,
@@ -22,10 +23,10 @@
   handle_cast/2,
   handle_info/2,
   terminate/2,
-  code_change/3]).
+  code_change/3, restart_node/1, members_flat/0, get_map/0]).
 
 -define(SERVER, ?MODULE).
--define(NAME, "KV Raft Cluster").
+-define(CLUSTER_NAME, "KV Raft Cluster").
 
 
 -record(state, {}).
@@ -46,7 +47,7 @@ start_link() ->
   gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
 init([]) ->
-  io:format("Starting"),
+  io:format("Starting~n"),
   {ok, #state{}}.
 
 callback_mode() ->
@@ -54,10 +55,10 @@ callback_mode() ->
 
 
 handle_call({startlocal}, _From, State) ->
-  R = raft_kv_sm:start_cluster(?NAME, node()),
+  R = raft_kv_sm:start_cluster(?CLUSTER_NAME, node()),
   {reply, R, State};
 handle_call({join, Node}, _From, State) ->
-  R = raft_kv_sm:start_and_join(?NAME, Node),
+  R = raft_kv_sm:start_and_join(?CLUSTER_NAME, Node),
   {reply, R, State};
 handle_call({write, Key, Value}, _From, State) ->
   R = raft_kv_sm:write({kv, node()}, Key, Value),
@@ -67,7 +68,17 @@ handle_call({read, Key}, _From, State) ->
   {reply, R, State};
 handle_call({members, Node}, _From, State) ->
   raft_kv_sm:members(Node),
+  {reply, ok, State};
+handle_call({members_flat, Node}, _From, State) ->
+  R = raft_kv_sm:members_flat(Node),
+  {reply, R, State};
+handle_call({get_map, Node}, _From, State) ->
+  {ok, R} = raft_kv_sm:get_map({kv, Node}),
+  {reply, R, State};
+handle_call({restart, Node}, _From, State) ->
+  raft_kv_sm:restart_node({kv, Node}),
   {reply, ok, State}.
+
 
 
 handle_cast(_Request, State) ->
@@ -100,8 +111,32 @@ put(Key, Value) ->
 get(Key) ->
   gen_statem:call(?MODULE, {read, Key}).
 
+restart_node(Node) ->
+  gen_statem:call(?MODULE, {restart_node, Node}).
 
 members() ->
   gen_statem:call(?MODULE, {members, node()}).
+
+members_flat() ->
+  gen_statem:call(?MODULE, {members_flat, node()}).
+
+get_map() ->
+  gen_statem:call(?MODULE, {get_map, node()}).
+
+start_http() ->
+  start_http(8080).
+
+start_http(PORT) ->
+  Dispatch = cowboy_router:compile([
+    {'_', [
+      {"/", raft_kv_http_rest, []},
+      {"/get_map", raft_kv_http_rest_map, []}
+    ]}
+  ]),
+  {ok, _} = cowboy:start_clear(http, [{port, PORT}], #{
+    env => #{dispatch => Dispatch}
+  }).
+
+
 
 

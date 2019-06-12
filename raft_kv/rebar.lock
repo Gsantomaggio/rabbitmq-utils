@@ -1,1 +1,22 @@
-[].
+{"1.1.0",
+[{<<"aten">>,{pkg,<<"aten">>,<<"0.5.2">>},1},
+ {<<"cowboy">>,{pkg,<<"cowboy">>,<<"2.6.3">>},0},
+ {<<"cowlib">>,{pkg,<<"cowlib">>,<<"2.7.3">>},1},
+ {<<"gen_batch_server">>,{pkg,<<"gen_batch_server">>,<<"0.7.0">>},1},
+ {<<"jsx">>,
+  {git,"https://github.com/talentdeficit/jsx.git",
+       {ref,"3074d4865b3385a050badf7828ad31490d860df5"}},
+  0},
+ {<<"ra">>,
+  {git,"https://github.com/rabbitmq/ra.git",
+       {ref,"724043e0a8d81d0e2bc6fad0b9c2b95420422e76"}},
+  0},
+ {<<"ranch">>,{pkg,<<"ranch">>,<<"1.7.1">>},1}]}.
+[
+{pkg_hash,[
+ {<<"aten">>, <<"2B4D31261D36C0A11CD6D04AE3F96C8951EB32106E9D2013A5B33BA14F7875AE">>},
+ {<<"cowboy">>, <<"99AA50E94E685557CAD82E704457336A453D4ABCB77839AD22DBE71F311FCC06">>},
+ {<<"cowlib">>, <<"A7FFCD0917E6D50B4D5FB28E9E2085A0CEB3C97DEA310505F7460FF5ED764CE9">>},
+ {<<"gen_batch_server">>, <<"FA458AEBA2979C49F197F2CD33E0C39A42F31CFF80040162FF07405FD9D3D303">>},
+ {<<"ranch">>, <<"6B1FAB51B49196860B733A49C07604465A47BDB78AA10C1C16A3D199F7F8C881">>}]}
+].

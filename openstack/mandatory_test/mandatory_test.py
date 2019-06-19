@@ -1,10 +1,7 @@
 import oslo_messaging
 from oslo_config import cfg
-from oslo_messaging import exceptions
 import _thread
 import time
-import threading
-from tenacity import *
 
 
 class TestEndpoint(object):
@@ -30,25 +27,13 @@ def start_server():
 
 
 def call(transport, target, number):
-    client = oslo_messaging.RPCClient(transport, target, options={'mandatory': True})
+    options = oslo_messaging.TransportOptions(transport, at_least_once=True)
+    client = oslo_messaging.RPCClient(transport, target, transport_options=options.get_options())
 
-    for i in range(1, 50):
-
-        time.sleep(3)
-        try:
-            r = client.call({}, 'foo', id_value=str(i), test_value="hello oslo")
-            print("hello" + r + " - number: " + str(number))
-        except exceptions.MessageUndeliverable as e:
-            print("MessageUndeliverable error, RabbitMQ Exception: %s, routing_key: %s message: %s exchange: %s:" % (
-                e.exception, e.routing_key, e.message.body, e.exchange))
-
-
-@retry(retry=retry_if_exception_type(exceptions.MessageUndeliverable))
-def call_and_retry(transport, target, number):
-    """publish data and retry by using tenacity if the message is undeliverable"""
-    client = oslo_messaging.RPCClient(transport, target, options={'mandatory': True})
-    r = client.call({}, 'foo', id_value="Retry", test_value="hello oslo")
-    print("hello" + r + " - number: " + str(number))
+    for i in range(0, 10):
+        time.sleep(0.2)
+        r = client.call({}, 'foo', id_value=str(i), test_value="ciao")
+        print("hello" + r + " - number: " + str(number))
 
 
 def start_client():
@@ -57,7 +42,6 @@ def start_client():
     target = oslo_messaging.Target(topic='myroutingkey', version='2.0',
                                    namespace='test')
     _thread.start_new_thread(call, (transport, target, 1,))
-    _thread.start_new_thread(call_and_retry, (transport, target, 1,))
     # _thread.start_new_thread(call, (transport, target, 2,))
     # _thread.start_new_thread(call, (transport, target, 3,))
     # _thread.start_new_thread(call, (transport, target, 4,))

@@ -7,9 +7,31 @@ Basic Idea
 ===
 The idea is to add another parameter to the function `RPCCLient` as:
 ```python
-client = oslo_messaging.RPCClient(transport, target, options={'mandatory': True})
-client.call({}, 'foo', id_value=str(i), test_value="hello oslo")
+options = oslo_messaging.TransportOptions(transport, at_least_once=True)
+client = oslo_messaging.RPCClient(transport, target, transport_options=options.get_options())
 ```
+
+each driver has to implement the function:
+```python
+def get_transport_options(self, at_least_once):
+     
+```
+
+for example the RabbitMQ driver:
+
+```python
+def get_transport_options(self, at_least_once):
+	return {"mandatory": at_least_once}
+```
+
+and the mandatory flag is:
+```python
+mandatory=is_mandatory(transport_options)
+```
+
+
+Not implemented yet
+===
 
 Inside the function, `_publish` decode the option value, as:
 

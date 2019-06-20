@@ -1,7 +1,11 @@
 Python test example for `mandatory` flag in olso.messaging 
 ===
 
-See: https://review.opendev.org/#/c/660373/ 
+See: 
+* https://blueprints.launchpad.net/oslo.messaging/+spec/transport-options 
+* https://review.opendev.org/#/c/660373/ 
+
+
 
 Basic Idea
 ===

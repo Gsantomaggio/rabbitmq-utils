@@ -27,8 +27,8 @@ def start_server():
 
 
 def call(transport, target, number):
-    options = oslo_messaging.TransportOptions(transport, at_least_once=True)
-    client = oslo_messaging.RPCClient(transport, target, transport_options=options.get_options())
+    options = oslo_messaging.TransportOptions(at_least_once=True)
+    client = oslo_messaging.RPCClient(transport, target, transport_options=options)
 
     for i in range(0, 10):
         time.sleep(0.2)

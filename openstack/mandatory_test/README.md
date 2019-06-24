@@ -11,26 +11,8 @@ Basic Idea
 ===
 The idea is to add another parameter to the function `RPCCLient` as:
 ```python
-options = oslo_messaging.TransportOptions(transport, at_least_once=True)
-client = oslo_messaging.RPCClient(transport, target, transport_options=options.get_options())
-```
-
-each driver has to implement the function:
-```python
-def get_transport_options(self, at_least_once):
-     
-```
-
-for example the RabbitMQ driver:
-
-```python
-def get_transport_options(self, at_least_once):
-	return {"mandatory": at_least_once}
-```
-
-and the mandatory flag is:
-```python
-mandatory=is_mandatory(transport_options)
+options = oslo_messaging.TransportOptions(at_least_once=True)
+client = oslo_messaging.RPCClient(transport, target, transport_options=options)
 ```
 
 

@@ -2,6 +2,16 @@
 
 This is a Distributed Key Value example based on [Ra](https://github.com/rabbitmq/ra).
 
+## Requirements
+
+* [rebar3](https://github.com/erlang/rebar3)
+
+## Setup your env
+
+```bash
+wget https://s3.amazonaws.com/rebar3/rebar3 && chmod +x rebar3
+```
+
 ## Compiling
 
 ``` bash

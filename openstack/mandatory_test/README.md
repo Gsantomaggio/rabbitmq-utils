@@ -45,49 +45,31 @@ in this way:
 ``` 
 
 
-how to test it
+How to test it
 ===
 * `git clone https://review.opendev.org/openstack/oslo.messaging mandatory`
 * `cd mandatory && git review -d 667902`
 * `python3 -m venv . && source bin/activate`
-* `python3 -m pip install pbr`
+* `pip install -r requirements.txt`
 * `python3 setup.py develop`
 * `wget https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-utils/master/openstack/mandatory_test/mandatory_test.py`
 * `sudo docker run -d -p 5672:5672  --hostname  my-rabbit  rabbitmq:3`
-* `python3 mandatory_test.py`
+* `python3 madatory_client_fail.py  enable_mandatory` 
 
-Result:
+you can reapeat the test using:
+`python3 madatory_client_fail.py default` that is the currect behaviour, you will the different in response time.
+
+
+ * `enable_mandatory` is reaised immediatly
+ * `default` you have to wait the default timeout 
+
+`enable_mandatory` result:
 ```
-starting client
 MessageUndeliverable error, RabbitMQ Exception: Basic.return: (312) NO_ROUTE, routing_key: my_not_existing_topic message: {"oslo.version": "2.0", "oslo.message": "{\"method\": \"foo\", \"args\": {\"id_value\": \"0\", \"test_value\": \"ciao\"}, \"namespace\": \"test\", \"version\": \"2.0\", \"_msg_id\": \"862e5d334e974bdb80ed18aedebb5b70\", \"_reply_q\": \"reply_cbd86ab1d4664597af3ab94975a9647f\", \"_timeout\": null, \"_unique_id\": \"6d9682551e69456ca2df52c5fe1f8b5d\"}"} exchange: my_exchange:
 ```
 
-Now try again by removing the option:
-`client = oslo_messaging.RPCClient(transport, target)`
-wait the timeout .....
+`enable_mandatory` result:
 ```
-Traceback (most recent call last):
-  File "mandatory_test.py", line 49, in call
-    r = client.call({}, 'foo', id_value=str(i), test_value="ciao")
-  File "/home/gabriele/git/OpenStack/mandatory/oslo_messaging/rpc/client.py", line 511, in call
-    return self.prepare().call(ctxt, method, **kwargs)
-  File "/home/gabriele/git/OpenStack/mandatory/oslo_messaging/rpc/client.py", line 181, in call
-    transport_options=self.transport_options)
-  File "/home/gabriele/git/OpenStack/mandatory/oslo_messaging/transport.py", line 129, in _send
-    transport_options=transport_options)
-  File "/home/gabriele/git/OpenStack/mandatory/oslo_messaging/_drivers/amqpdriver.py", line 646, in send
-    transport_options=transport_options)
-  File "/home/gabriele/git/OpenStack/mandatory/oslo_messaging/_drivers/amqpdriver.py", line 634, in _send
-    call_monitor_timeout)
-  File "/home/gabriele/git/OpenStack/mandatory/oslo_messaging/_drivers/amqpdriver.py", line 523, in wait
-    message = self.waiters.get(msg_id, timeout=timeout)
-  File "/home/gabriele/git/OpenStack/mandatory/oslo_messaging/_drivers/amqpdriver.py", line 401, in get
-    'to message ID %s' % msg_id)
-oslo_messaging.exceptions.MessagingTimeout: Timed out waiting for a reply to message ID b2aa0d96abc243f6ba792c4a8ab6747c
+MessagingTimeout error: Timed out waiting for a reply to message ID 986e56ef352d4a7a8b07d345eab13e49
 ```
 da daaa!!!
-
-
-Why does it fail?
-===
-Because of `topic` target is not the same, from [client](https://github.com/Gsantomaggio/rabbitmq-utils/blob/master/openstack/mandatory_test/mandatory_test.py#L69) and [server](https://github.com/Gsantomaggio/rabbitmq-utils/blob/master/openstack/mandatory_test/mandatory_test.py#L26)

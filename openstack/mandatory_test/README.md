@@ -63,12 +63,12 @@ you can reapeat the test using:
  * `enable_mandatory` is reaised immediatly
  * `default` you have to wait the default timeout 
 
-`default` result:
+`enable_mandatory` result:
 ```
 MessageUndeliverable error, RabbitMQ Exception: Basic.return: (312) NO_ROUTE, routing_key: my_not_existing_topic message: {"oslo.version": "2.0", "oslo.message": "{\"method\": \"foo\", \"args\": {\"id_value\": \"0\", \"test_value\": \"ciao\"}, \"namespace\": \"test\", \"version\": \"2.0\", \"_msg_id\": \"862e5d334e974bdb80ed18aedebb5b70\", \"_reply_q\": \"reply_cbd86ab1d4664597af3ab94975a9647f\", \"_timeout\": null, \"_unique_id\": \"6d9682551e69456ca2df52c5fe1f8b5d\"}"} exchange: my_exchange:
 ```
 
-`enable_mandatory` result:
+`default` result:
 ```
 MessagingTimeout error: Timed out waiting for a reply to message ID 986e56ef352d4a7a8b07d345eab13e49
 ```

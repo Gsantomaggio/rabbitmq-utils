@@ -52,10 +52,8 @@ How to test it
 * `python3 -m venv . && source bin/activate`
 * `pip install -r requirements.txt`
 * `python3 setup.py develop`
-* `wget https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-utils/master/openstack/mandatory_test/mandatory_test.py`
 * `wget https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-utils/master/openstack/mandatory_test/mandatory_client_fail.py`
 * `sudo docker run -d -p 5672:5672  --hostname  my-rabbit  rabbitmq:3`
-* `python3 mandatory_test.py  enable_mandatory` 
 * `python3 mandatory_client_fail.py  enable_mandatory` 
 
 you can reapeat the test using:

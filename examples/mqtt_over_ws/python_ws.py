@@ -19,6 +19,7 @@ def on_message(client, userdata, msg):
     # receive the message, can be used in normal applications
     # mobile or web applications
     print("Message from MQTT over WS" + msg.topic + " " + str(msg.payload))
+    print("-------")
 
 
 def subscribe_mqtt():
@@ -38,7 +39,7 @@ class PyPikaTest:
 
     def on_rabbitmq_message(self, ch, method, properties, body):
         # here the message is received from RabbitMQ and forwarded to the ws client
-        print("Message on RabbitMQ, going to redirect to mqtt %s \n" % (body))
+        print("Message on RabbitMQ, going to redirect to mqtt %s" % (body))
 
         # change the source rabbitmq key to mqtt key
         # you don't have to change anything in term of the keys
@@ -72,7 +73,7 @@ class PyPikaTest:
             channel.basic_publish(
                 exchange='notify',
                 routing_key="event.mykey.mysubkey.xxx",
-                body='Run: ' + str(i)
+                body='my_event_detail: ' + str(i)
             )
         print("end: %s" % (time.ctime(time.time())))
 

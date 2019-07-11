@@ -52,12 +52,12 @@ How to test it
 * `python3 -m venv . && source bin/activate`
 * `pip install -r requirements.txt`
 * `python3 setup.py develop`
-* `wget https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-utils/master/openstack/mandatory_test/mandatory_test.py`
+* `wget https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-utils/master/openstack/mandatory_test/mandatory_client_fail.py`
 * `sudo docker run -d -p 5672:5672  --hostname  my-rabbit  rabbitmq:3`
-* `python3 madatory_client_fail.py  enable_mandatory` 
+* `python3 mandatory_client_fail.py  enable_mandatory` 
 
 you can reapeat the test using:
-`python3 madatory_client_fail.py default` that is the currect behaviour, you will the different in response time.
+`python3 mandatory_client_fail.py default` that is the currect behaviour, you will the different in response time.
 
 
  * `enable_mandatory` is reaised immediatly
@@ -68,7 +68,7 @@ you can reapeat the test using:
 MessageUndeliverable error, RabbitMQ Exception: Basic.return: (312) NO_ROUTE, routing_key: my_not_existing_topic message: {"oslo.version": "2.0", "oslo.message": "{\"method\": \"foo\", \"args\": {\"id_value\": \"0\", \"test_value\": \"ciao\"}, \"namespace\": \"test\", \"version\": \"2.0\", \"_msg_id\": \"862e5d334e974bdb80ed18aedebb5b70\", \"_reply_q\": \"reply_cbd86ab1d4664597af3ab94975a9647f\", \"_timeout\": null, \"_unique_id\": \"6d9682551e69456ca2df52c5fe1f8b5d\"}"} exchange: my_exchange:
 ```
 
-`enable_mandatory` result:
+`default` result:
 ```
 MessagingTimeout error: Timed out waiting for a reply to message ID 986e56ef352d4a7a8b07d345eab13e49
 ```

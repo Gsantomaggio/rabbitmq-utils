@@ -1,3 +1,5 @@
+## pip install paho-mqtt
+## pip install pika
 import _thread
 
 import paho.mqtt.client as mqtt

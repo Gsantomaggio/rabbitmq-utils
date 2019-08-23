@@ -48,7 +48,7 @@ in this way:
 How to test it
 ===
 * `git clone https://review.opendev.org/openstack/oslo.messaging mandatory`
-* `cd mandatory && git review -d 667902`
+* `cd mandatory`
 * `python3 -m venv . && source bin/activate`
 * `pip install -r requirements.txt`
 * `python3 setup.py develop`

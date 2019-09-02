@@ -1,0 +1,3 @@
+#!/bin/bash
+helm install --name  prom -f values.yaml  stable/prometheus-operator 
+

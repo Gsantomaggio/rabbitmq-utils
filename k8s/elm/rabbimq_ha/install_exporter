@@ -1,0 +1,2 @@
+#!/bin/bash
+helm install --name rmq-exp -f rabbitmq_exporter_values.yaml stable/prometheus-rabbitmq-exporter

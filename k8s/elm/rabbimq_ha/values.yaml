@@ -372,7 +372,7 @@ grafana:
   ##
   defaultDashboardsEnabled: true
 
-  adminPassword: prom-operator
+  adminPassword: admin
 
   service:
     annotations: {}
@@ -1520,7 +1520,7 @@ prometheus:
       - job_name: rabbitmq-prometheus
         static_configs:
           - targets:
-            - rmq-ha-rabbitmq-ha:9090
+            - rmq-exp-prometheus-rabbitmq-exporter:9419
  
     # - job_name: kube-etcd
     #   kubernetes_sd_configs:

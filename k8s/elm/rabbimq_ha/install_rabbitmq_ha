@@ -1,3 +1,2 @@
 #!/bin/bash
-helm install --name rmq-ha  stable/rabbitmq-ha --set persistentVolume.enabled=true,prometheus.exporter.enabled=true,prometheus.operator.serviceMonitor.namespace=default,rabbitmqPassword=rabbitmq_password
-
+helm install --name rmq-ha -f rabbitmq-ha_values.yaml stable/rabbitmq-ha 

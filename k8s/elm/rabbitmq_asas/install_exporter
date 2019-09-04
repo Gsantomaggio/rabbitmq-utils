@@ -1,0 +1,3 @@
+#!/bin/bash
+helm install --name rmq-exp -f rabbitmq-exporter_values.yaml stable/prometheus-rabbitmq-exporter --namespace stage \
+--set rabbitmq.url=http://rmq-ha-rabbitmq-ha.stage:15672 

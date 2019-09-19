@@ -1,0 +1,16 @@
+#!/bin/bash
+kind create cluster
+sleep 17
+export KUBECONFIG="$(kind get kubeconfig-path --name="kind")"
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta4/aio/deploy/recommended.yaml
+sleep 14
+kubectl apply -f dashboard/dashboard-adminuser.yaml
+kubectl apply -f dashboard/admin-role-binding.yml
+sleep 2
+helm init --wait
+sleep 10
+kubectl create serviceaccount --namespace kube-system tiller
+kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
+sleep 10
+helm install stable/prometheus-operator

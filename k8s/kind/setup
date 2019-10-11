@@ -1,9 +1,9 @@
 #!/bin/bash
 kind create cluster
-sleep 17
+sleep 3
 export KUBECONFIG="$(kind get kubeconfig-path --name="kind")"
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta4/aio/deploy/recommended.yaml
-sleep 14
+sleep 8
 kubectl apply -f dashboard/dashboard-adminuser.yaml
 kubectl apply -f dashboard/admin-role-binding.yml
 sleep 2

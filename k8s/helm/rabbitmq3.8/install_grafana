@@ -1,0 +1,2 @@
+#!/bin/bash
+helm install --name graf -f grafana_values.yaml stable/grafana 

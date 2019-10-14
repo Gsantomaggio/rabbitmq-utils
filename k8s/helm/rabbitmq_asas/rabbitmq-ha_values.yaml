@@ -2,7 +2,7 @@
 ## Ref: http://rabbitmq.com/access-control.html
 ##
 rabbitmqUsername: guest
-rabbitmqPassword: test
+# rabbitmqPassword:
 
 ## RabbitMQ Management user used for health checks
 managementUsername: management
@@ -271,11 +271,11 @@ rabbitmqAmqpsSupport:
     # ssl_options.fail_if_no_peer_cert  = false
 
 ## Number of replicas
-replicaCount: 1
+replicaCount: 3
 
 image:
   repository: rabbitmq
-  tag: 3.7.15-alpine
+  tag: 3.8.0-alpine
   pullPolicy: IfNotPresent
   ## Optionally specify an array of imagePullSecrets.
   ## Secrets must be manually created in the namespace.
@@ -361,7 +361,7 @@ extraContainers: []
 
 ## Data Persistency
 persistentVolume:
-  enabled: true
+  enabled: false
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
   ## If undefined (the default) or set to null, no storageClassName spec is
@@ -372,7 +372,7 @@ persistentVolume:
   name: data
   accessModes:
     - ReadWriteOnce
-  size: 12Gi
+  size: 8Gi
   annotations: {}
 
 ## Node labels for pod assignment
@@ -478,13 +478,14 @@ prometheus:
   ## Configures Prometheus Exporter to expose and scrape stats.
   exporter:
     enabled: false
+    env: {}
     image:
       repository: kbudde/rabbitmq-exporter
       tag: v0.29.0
       pullPolicy: IfNotPresent
 
     ## Port Prometheus scrapes for metrics
-    port: 9090 
+    port: 9090
     ## Comma-separated list of extended scraping capabilities supported by the target RabbitMQ server
     capabilities: "bert,no_sort"
 
@@ -500,12 +501,12 @@ prometheus:
   ## Prometheus is using Operator.  Setting to true will create Operator specific resources like ServiceMonitors and Alerts
   operator:
     ## Are you using Prometheus Operator? [Blog Post](https://coreos.com/blog/the-prometheus-operator.html)
-    enabled: false
+    enabled: true
 
     ## Configures Alerts, which will be setup via Prometheus Operator / ConfigMaps.
     alerts:
       ## Prometheus exporter must be enabled as well
-      enabled: false
+      enabled: true
 
       ## Selector must be configured to match Prometheus Install, defaulting to whats done by Prometheus Operator
       ## See [CoreOS Prometheus Chart](https://github.com/coreos/prometheus-operator/tree/master/helm)
@@ -518,7 +519,7 @@ prometheus:
       interval: 10s
 
       # Namespace Prometheus is installed in
-      namespace: default
+      namespace: monitoring
 
       ## Defaults to whats used if you follow CoreOS [Prometheus Install Instructions](https://github.com/coreos/prometheus-operator/tree/master/helm#tldr)
       ## [Prometheus Selector Label](https://github.com/coreos/prometheus-operator/blob/master/helm/prometheus/templates/prometheus.yaml#L65)

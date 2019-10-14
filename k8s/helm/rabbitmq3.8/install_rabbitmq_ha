@@ -1,0 +1,3 @@
+#!/bin/bash
+helm install --name rmq-ha -f rabbitmq-ha_values.yaml  ~/git/personal/charts/stable/rabbitmq-ha
+

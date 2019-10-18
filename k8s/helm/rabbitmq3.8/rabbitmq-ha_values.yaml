@@ -255,12 +255,13 @@ rabbitmqWebSTOMPPlugin:
 
 ## Prometheus Plugin
 ## Ref: https://www.rabbitmq.com/prometheus.html
-rabbitmqPrometheus:
+rabbitmqPrometheusPlugin:
   enabled: true
   ## Prometheus configuration:
+  metricsNodePort: 15692
   config: |
-   # prometheus.path = /metrics
-   # prometheus.tcp.port =  15692
+          # prometheus.path = /metrics
+          #prometheus.tcp.port = 15692 
 
 ## AMQPS support
 ## Ref: http://www.rabbitmq.com/ssl.html
@@ -510,12 +511,12 @@ prometheus:
   ## Prometheus is using Operator.  Setting to true will create Operator specific resources like ServiceMonitors and Alerts
   operator:
     ## Are you using Prometheus Operator? [Blog Post](https://coreos.com/blog/the-prometheus-operator.html)
-    enabled: true
+    enabled: false
 
     ## Configures Alerts, which will be setup via Prometheus Operator / ConfigMaps.
     alerts:
       ## Prometheus exporter must be enabled as well
-      enabled: true
+      enabled: false
 
       ## Selector must be configured to match Prometheus Install, defaulting to whats done by Prometheus Operator
       ## See [CoreOS Prometheus Chart](https://github.com/coreos/prometheus-operator/tree/master/helm)

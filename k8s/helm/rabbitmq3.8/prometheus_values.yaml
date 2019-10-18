@@ -1050,9 +1050,23 @@ serverFiles:
             - localhost:9090
 
       - job_name: prometheus-rabbitmq
-        static_configs:
-          - targets:
-            - rmq-ha-rabbitmq-ha:15692
+        kubernetes_sd_configs:
+            - role: pod
+        relabel_configs:
+        #          # Scrape only the the targets matching the following metadata
+           - source_labels: [__meta_kubernetes_pod_label_app, __meta_kubernetes_pod_container_port_name]
+             action: keep
+             regex: rabbitmq-ha;metrics
+        #          # Rename metadata labels to be reader friendly
+        #   - source_labels: [__meta_kubernetes_namespace]
+        #     target_label: namespace
+        #   - source_labels: [__meta_kubernetes_pod_name]
+        #     target_label: pod
+        #   - source_labels: [__meta_kubernetes_service_name]
+        #     target_label: service
+
+              #- rmq-ha-rabbitmq-ha-1:9090
+              #- rmq-ha-rabbitmq-ha-2:9090
 
       # A scrape configuration for running Prometheus on a Kubernetes cluster.
       # This uses separate scrape configs for cluster components (i.e. API server, node)

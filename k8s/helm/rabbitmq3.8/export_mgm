@@ -1,4 +1,5 @@
 #!/bin/bash
+export KUBECONFIG="$(kind get kubeconfig-path --name="kind")"
 export POD_NAME=$(kubectl get pods --namespace default -l "app=rabbitmq-ha" -o jsonpath="{.items[0].metadata.name}")
 kubectl port-forward $POD_NAME --namespace default 5672:5672 15672:15672 15692:15692
 

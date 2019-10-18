@@ -294,18 +294,18 @@ notifiers: {}
 ##
 ## `path` must be /var/lib/grafana/dashboards/<provider_name>
 ##
-dashboardProviders: {}
-#  dashboardproviders.yaml:
-#    apiVersion: 1
-#    providers:
-#    - name: 'default'
-#      orgId: 1
-#      folder: ''
-#      type: file
-#      disableDeletion: false
-#      editable: true
-#      options:
-#        path: /var/lib/grafana/dashboards/default
+dashboardProviders: 
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+    - name: 'default'
+      orgId: 1
+      folder: ''
+      type: file
+      disableDeletion: false
+      editable: true
+      options:
+        path: /var/lib/grafana/dashboards/default
 
 ## Configure grafana dashboard to import
 ## NOTE: To use dashboards you must also enable/configure dashboardProviders
@@ -318,15 +318,22 @@ dashboards:
   #   some-dashboard:
   #     json: |
   #       $RAW_JSON
-     
-     prometheus-stats:
-       gnetId: 2
-       revision: 2
-       datasource: Prometheus
-  #   custom-dashboard:
+        overview-stats:
+          gnetId: 6566
+          revision: 0
+          datasource: Prometheus
+        perf-stats:
+          gnetId: 10988
+          revision: 0
+          datasource: Prometheus
+        erlang-stats:
+          gnetId: 10991
+          revision: 0
+          datasource: Prometheus
+           #  #   custom-dashboard:
   #     file: dashboards/rabbitmq-monitoring.json 
-     local-dashboard:
-       url: https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-utils/master/k8s/elm/rabbimq_ha/dashboards/rabbitmq-monitoring.json
+      #local-dashboard:
+      #       url: https://github.com/rabbitmq/rabbitmq-prometheus/blob/master/docker/grafana/dashboards/RabbitMQ-Overview.json
   #   local-dashboard-base64:
   #     url: https://example.com/repository/test-b64.json
   #     b64content: true

@@ -36,11 +36,11 @@ definitions:
 #        "value": "rabbitmq-ha"
 #    }
   users: |-
-#   {
-#     "name": "myUsername",
-#     "password": "myPassword",
-#     "tags": "administrator"
-#   }
+   {
+     "name": "test",
+     "password": "test",
+     "tags": "administrator"
+   }
   vhosts: |-
 #   {
 #     "name": "/rabbit"
@@ -61,13 +61,13 @@ definitions:
 #     "name": "test"
 #   }
   permissions: |-
-#   {
-#     "user": "myUsername",
-#     "vhost": "/rabbit",
-#     "configure": ".*",
-#     "write": ".*",
-#     "read": ".*"
-#   }
+   {
+     "user": "test",
+     "vhost": "/",
+     "configure": ".*",
+     "write": ".*",
+     "read": ".*"
+   }
   queues: |-
 #    {
 #       "name":"myName",
@@ -256,12 +256,23 @@ rabbitmqWebSTOMPPlugin:
 ## Prometheus Plugin
 ## Ref: https://www.rabbitmq.com/prometheus.html
 rabbitmqPrometheusPlugin:
-  enabled: true
+  enabled: true #DEMO
+
+  ## NodePort
+  nodePort: null
+
+  ## metrics port, overrides configuration:
+  ## prometheus.tcp.port
+  port: 15692
+
+  ## metrics path, overrides configuration:
+  ## prometheus.path
+  path: /metrics
+
   ## Prometheus configuration:
-  metricsNodePort: 15692
+  ## https://github.com/rabbitmq/rabbitmq-prometheus
   config: |
-          # prometheus.path = /metrics
-          #prometheus.tcp.port = 15692 
+   ## prometheus.path and prometheus.tcp.port can be set above
 
 ## AMQPS support
 ## Ref: http://www.rabbitmq.com/ssl.html
@@ -281,8 +292,7 @@ rabbitmqAmqpsSupport:
     # ssl_options.fail_if_no_peer_cert  = false
 
 ## Number of replicas
-replicaCount: 3
-
+replicaCount: 2 ###DEMO
 image:
   repository: rabbitmq
   tag: 3.8.0-alpine
@@ -426,6 +436,10 @@ serviceAccount:
   ## The name of the ServiceAccount to use.
   ## If not set and create is true, a name is generated using the fullname template
   # name:
+
+  ## Automount API credentials for a service account.
+  ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#use-the-default-service-account-to-access-the-api-server
+  automountServiceAccountToken: true
 
 ingress:
   ## Set to true to enable ingress record generation

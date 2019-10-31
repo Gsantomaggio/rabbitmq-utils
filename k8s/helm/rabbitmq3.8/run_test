@@ -1,0 +1,3 @@
+#!/bin/bash
+source ../../../examples/python/.env3/bin/activate
+python3 ../../../examples/python//pika_produce_consume.py localhost

@@ -589,13 +589,13 @@ server:
   global:
     ## How frequently to scrape targets by default
     ##
-    scrape_interval: 1m
+    scrape_interval: 20s
     ## How long until a scrape request times out
     ##
     scrape_timeout: 10s
     ## How frequently to evaluate rules
     ##
-    evaluation_interval: 1m
+    evaluation_interval: 20s
 
   ## Additional Prometheus server container arguments
   ##
@@ -1049,7 +1049,7 @@ serverFiles:
           - targets:
             - localhost:9090
 
-      - job_name: prometheus-rabbitmq
+      - job_name: prometheus-rabbitmq ##DEMO
         kubernetes_sd_configs:
             - role: pod
         relabel_configs:

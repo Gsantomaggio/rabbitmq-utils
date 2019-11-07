@@ -1,2 +1,0 @@
-#!/bin/bash
-helm install --name prom -f prometheus_values.yaml stable/prometheus

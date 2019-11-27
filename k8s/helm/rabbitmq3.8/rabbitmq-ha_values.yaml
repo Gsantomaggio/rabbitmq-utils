@@ -256,7 +256,7 @@ rabbitmqWebSTOMPPlugin:
 ## Prometheus Plugin
 ## Ref: https://www.rabbitmq.com/prometheus.html
 rabbitmqPrometheusPlugin:
-  enabled: true #DEMO
+  enabled: false #DEMO
 
   ## NodePort
   nodePort: null
@@ -292,10 +292,10 @@ rabbitmqAmqpsSupport:
     # ssl_options.fail_if_no_peer_cert  = false
 
 ## Number of replicas
-replicaCount: 1 ###DEMO
+replicaCount: 3 ###DEMO
 image:
   repository: rabbitmq
-  tag: 3.8.0-alpine
+  tag: 3.8.1-alpine
   pullPolicy: IfNotPresent
   ## Optionally specify an array of imagePullSecrets.
   ## Secrets must be manually created in the namespace.
@@ -381,18 +381,18 @@ extraContainers: []
 
 ## Data Persistency
 persistentVolume:
-  enabled: false
+  enabled: true
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
   ## If undefined (the default) or set to null, no storageClassName spec is
   ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
   ##   GKE, AWS & OpenStack)
   ##
-  # storageClass: "-"
+  storageClass: "local-path"
   name: data
   accessModes:
     - ReadWriteOnce
-  size: 8Gi
+  size: 2Gi
   annotations: {}
 
 ## Node labels for pod assignment

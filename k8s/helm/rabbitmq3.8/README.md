@@ -63,22 +63,45 @@ helm install --name prom -f prometheus_values.yaml stable/prometheus
 ```
 
 
-Use `export_prom` to test it locally: http://localhost:9000
+Use `export_prom`:
+```
+/export_prom
+Forwarding from 127.0.0.1:9090 -> 9090
+Forwarding from [::1]:9090 -> 9090
+```
 
-Check the targets on http://localhost:9090/targets:
+test it locally on: http://localhost:9000
+
+Check the targets on: http://localhost:9090/targets:
 
 ![RabbitMQ Targets](https://github.com/Gsantomaggio/rabbitmq-utils/blob/master/k8s/helm/rabbitmq3.8/img/prom_rabbitmq_targets.png)
 
 
-
-
-
 ### Deploy Grafana
 
-Use the script: 6_install_grafana to install Grafana with the Prometheus link and the RabbitMQ templates
-Use export_graf to test it locally: http://localhost:3000 (user: admin, password: admin1)
+Use the script: 6_install_grafana to install Grafana with the Prometheus link and the RabbitMQ templates:
 
-The installation is ready.
+
+```
+helm install --name graf -f grafana_values.yaml stable/grafana 
+```
+
+
+Use `export_graf` 
+```
+./export_graf
+Forwarding from 127.0.0.1:3000 -> 3000
+Forwarding from [::1]:3000 -> 3000
+```
+
+Test it locally on: http://localhost:3000 (user: admin, password: admin1)
+
+The installation is ready:
+
+![RabbitMQ Targets](https://github.com/Gsantomaggio/rabbitmq-utils/blob/master/k8s/helm/rabbitmq3.8/img/rabbitmq_grafana.png)
+
+
+
 
 **Note: In this example, the data are not persistent to the disk, so don't use it in production; this is only for test.**
 

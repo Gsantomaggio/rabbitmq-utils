@@ -8,9 +8,9 @@ kubectl apply -f dashboard/dashboard-adminuser.yaml
 kubectl apply -f dashboard/admin-role-binding.yml
 sleep 2
 helm init --wait
-sleep 10
+sleep 5
 kubectl create serviceaccount --namespace kube-system tiller
 kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
 kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
-sleep 10
-helm install stable/prometheus-operator
+sleep 2
+#helm install stable/prometheus-operator

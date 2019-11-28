@@ -319,7 +319,7 @@ dashboards:
   #     json: |
   #       $RAW_JSON
         overview-stats:
-          gnetId: 6566
+          gnetId: 10991
           revision: 0
           datasource: Prometheus
         perf-stats:

@@ -256,7 +256,7 @@ rabbitmqWebSTOMPPlugin:
 ## Prometheus Plugin
 ## Ref: https://www.rabbitmq.com/prometheus.html
 rabbitmqPrometheusPlugin:
-  enabled: false #DEMO
+  enabled: true #DEMO
 
   ## NodePort
   nodePort: null

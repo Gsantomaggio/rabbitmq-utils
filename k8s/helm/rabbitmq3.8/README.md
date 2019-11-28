@@ -41,10 +41,37 @@ Then point to http://localhost:15672 ( user: guest and password: test )
 The RabbitMQ cluster is ready and also the Prometheus metrics should be exposed, check the url: 
 http://localhost:15692/metrics
 
+you should have:
+```
+➜  ~ curl  -s http://localhost:15692/metrics | more
+# TYPE erlang_mnesia_held_locks gauge
+# HELP erlang_mnesia_held_locks Number of held locks.
+erlang_mnesia_held_locks 0
+# TYPE erlang_mnesia_lock_queue gauge
+# HELP erlang_mnesia_lock_queue Number of transactions waiting for a lock.
+erlang_mnesia_lock_queue 0
+# TYPE erlang_mnesia_transaction_participants gauge
+```
+
+
 ### Deploy Prometheus 
 
 Use the script: `5_install_prometheus` to install Prometheus with also the RabbitMQ metrics.
-Use export_prom to test it locally: http://localhost:9000 
+
+```
+helm install --name prom -f prometheus_values.yaml stable/prometheus
+```
+
+
+Use `export_prom` to test it locally: http://localhost:9000
+
+Check the targets on http://localhost:9090/targets:
+
+![RabbitMQ Targets](https://github.com/Gsantomaggio/rabbitmq-utils/blob/master/k8s/helm/rabbitmq3.8/img/prom_rabbitmq_targets.png)
+
+
+
+
 
 ### Deploy Grafana
 

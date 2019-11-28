@@ -1,5 +1,8 @@
 ## Deploy and monitoring a RabbitMQ Cluster with Helm 
 
+**Note: In this example, the data are not persistent to the disk, so don't use it in production; this is only for test.**
+
+
 To run this example, you need:
  * [Kind](https://github.com/kubernetes-sigs/kind)
  * [Helm client](https://helm.sh/)
@@ -99,11 +102,6 @@ Test it locally on: http://localhost:3000 (user: admin, password: admin1)
 The installation is ready:
 
 ![RabbitMQ Targets](https://github.com/Gsantomaggio/rabbitmq-utils/blob/master/k8s/helm/rabbitmq3.8/img/rabbitmq_grafana.png)
-
-
-
-
-**Note: In this example, the data are not persistent to the disk, so don't use it in production; this is only for test.**
 
 
 

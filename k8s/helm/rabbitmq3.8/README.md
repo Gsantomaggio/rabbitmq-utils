@@ -1,24 +1,41 @@
 ## Deploy and monitoring a RabbitMQ Cluster with Helm 
 
 To run this example, you need:
- * Kind
- * Helm client
+ * [Kind](https://github.com/kubernetes-sigs/kind)
+ * [Helm client](https://helm.sh/)
 
 Then following these steps:
-Setup Kind
-Deploy RabbitMQ
-Deploy Prometheus 
-Deploy Grafana
+ * Setup Kind
+ * Deploy RabbitMQ
+ * Deploy Prometheus 
+ * Deploy Grafana
 
 ### Setup Kind
-To set up, you can use this script ...  it:
+To set up, you can use this [script](https://github.com/Gsantomaggio/rabbitmq-utils/blob/master/k8s/kind/setup) , it:
  * creates the Kind cluster
  * setups the helm server 
  * installs the k8s dashboard
- * Deploy RabbitMQ 
+ 
+### Deploy RabbitMQ 
 You can use the  script: `3_install_rabbitmq.`
 
+```
+helm install --name rmq-ha -f rabbitmq-ha_values.yaml stable/rabbitmq-ha
+```
+
+
 If you want to check the RabbitMQ locally, you can use: `export_mgm.`
+
+```
+./export_mgm
+Forwarding from 127.0.0.1:5672 -> 5672
+Forwarding from [::1]:5672 -> 5672
+Forwarding from 127.0.0.1:15672 -> 15672
+Forwarding from [::1]:15672 -> 15672
+Forwarding from 127.0.0.1:15692 -> 15692
+Forwarding from [::1]:15692 -> 15692
+```
+
 Then point to http://localhost:15672 ( user: guest and password: test ) 
 
 The RabbitMQ cluster is ready and also the Prometheus metrics should be exposed, check the url: 

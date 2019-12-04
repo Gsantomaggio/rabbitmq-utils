@@ -16,7 +16,7 @@ options = oslo_messaging.TransportOptions(at_least_once=True)
 client = oslo_messaging.RPCClient(transport, target, transport_options=options)
 ```
 
-the parameter `at_least_once` [is translated to `mandatory`](https://github.com/openstack/oslo.messaging/blob/master/oslo_messaging/_drivers/impl_rabbit.py#L1154) flag for RabbitMQ driver
+the parameter `at_least_once` [is translated to `mandatory`](https://github.com/openstack/oslo.messaging/blob/master/oslo_messaging/_drivers/impl_rabbit.py#L1223) flag for RabbitMQ driver
 
 
 

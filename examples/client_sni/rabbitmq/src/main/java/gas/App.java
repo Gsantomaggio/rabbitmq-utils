@@ -21,12 +21,12 @@ import java.util.List;
 
 public class App {
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        System.out.println("Testing SNI value: " + args[1]);
 
         try {
 
             ConnectionFactory factory = new ConnectionFactory();
-            factory.setHost("localhost");
+            factory.setHost(args[0]);
             factory.setUsername("test");
             factory.setPassword("test");
             factory.setPort(5671);
@@ -35,7 +35,7 @@ public class App {
             factory.useSslProtocol();
             NioParams nioParams = new NioParams();
             final SSLParameters sslParameters = new SSLParameters();
-            SNIHostName sniHostName = new SNIHostName("rabbitmq.tls.sni.test");
+            SNIHostName sniHostName = new SNIHostName(args[1]);
             final List<SNIServerName> sniHostNameList = new ArrayList<>(1);
             sniHostNameList.add(sniHostName);
             sslParameters.setServerNames(sniHostNameList);
@@ -60,7 +60,6 @@ public class App {
             // non-durable, exclusive, auto-delete queue
             channel.queueDeclare("rabbitmq-java-test", false, true, true, null);
             channel.basicPublish("", "rabbitmq-java-test", null, "Hello, World".getBytes());
-            // TimeUnit.SECONDS.sleep(60);
             GetResponse chResponse = channel.basicGet("rabbitmq-java-test", false);
             if (chResponse == null) {
                 System.out.println("No message retrieved");

@@ -18,6 +18,9 @@ When ready you have:
 ex: Management ui:
 http://10.0.0.10:15672
 
+- user name: `test`
+- password: `test`
+
 So:
 
 ![cluster](https://raw.githubusercontent.com/Gsantomaggio/rabbitmq-utils/master/rabbitmq-suse/vagrant_cluster/img/cluster.png)

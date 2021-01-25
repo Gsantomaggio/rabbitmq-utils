@@ -1,7 +1,7 @@
-How to create a RabbitMQ cluster on openSUSE leap 15
+How to create a RabbitMQ cluster on Ubuntu
 ==
 
-This example creates 3 RabbitMQ nodes in cluster using openSUSE leap15
+This example creates 3 RabbitMQ nodes in cluster using Ubuntu
 
 Clone the repo or just copy the `Vagrantfile`
 
@@ -17,6 +17,9 @@ When ready you have:
  
 ex: Management ui:
 http://10.0.0.10:15672
+
+- user name: `test`
+- password: `test`
 
 So:
 

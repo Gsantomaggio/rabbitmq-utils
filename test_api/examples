@@ -1,0 +1,5 @@
+docker run --name some-wordpress -p 8080:80 -d wordpress
+docker run -it ubuntu /bin/bash
+docker run -it ubuntu:16.04 /bin/bash
+docker run -it ubuntu:16.04 /bin/bash
+

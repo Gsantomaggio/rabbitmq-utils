@@ -3,3 +3,21 @@ docker run -it ubuntu /bin/bash
 docker run -it ubuntu:16.04 /bin/bash
 docker run -it ubuntu:16.04 /bin/bash
 
+
+
+##### build the image:
+docker build -t xxxxxxx/myapp:3.0 .
+
+### push the image on docker hub
+docker push xxxxxxx/myapp:3.0
+
+### run the from docker hub
+docker run -d -p 5000:5000 xxxxxxx/myapp:3.0
+
+## note: reaplace xxxxxxx with your dockerhub username
+
+
+
+
+
+

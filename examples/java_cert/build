@@ -1,0 +1,16 @@
+# !/bin/bash
+rm rabbitstore
+rm -rf tls-gen
+git clone https://github.com/michaelklishin/tls-gen tls-gen
+cd tls-gen/basic && make && cd .. && cd ..
+
+echo "Import key, set the password, to make the example easy:"
+echo "- use the password: rabbitmq"
+echo "- set Trust this certificate? [no]:  yes"
+keytool -import  -alias server2 -file tls-gen/basic/result/server_certificate.pem -keystore rabbitstore
+
+val=$(openssl x509 -in tls-gen/basic/result/client_certificate.pem  -nameopt RFC2253 -subject -noout | awk '{print $2}')
+echo $val
+sed  "s/REPLACE_WITH_USER_NAME/$val/g" docker-compose.template > docker-compose.yaml
+echo "docker-compose.yaml is ready"
+echo "docker compose up to run RabbitMQ"

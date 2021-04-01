@@ -1,0 +1,17 @@
+version: '3'
+services:
+  rabbitmq_service:
+    image: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: O=client,CN=gsantomaggi-a01.vmware.com
+      RABBITMQ_DEFAULT_PASS: notimportat
+    expose:
+      - "15672"
+      -  "5672"
+    ports:
+      - "15672:15672"
+      - "5671:5671"
+    volumes:
+      - "./tls-gen/basic/result/:/cert"
+      - "./conf/:/etc/rabbitmq/"
+

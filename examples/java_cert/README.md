@@ -39,4 +39,4 @@ Received: Hello, World
 
 
 
-see also: https://www.rabbitmq.com/ssl.html#java-client-connecting as refer
+see also: https://www.rabbitmq.com/ssl.html#java-client-connecting as a reference

@@ -3,7 +3,7 @@ services:
   rabbitmq_service:
     image: rabbitmq
     environment:
-      RABBITMQ_DEFAULT_USER: O=client,CN=gsantomaggi-a01.vmware.com
+      RABBITMQ_DEFAULT_USER: REPLACE_WITH_USER_NAME
       RABBITMQ_DEFAULT_PASS: notimportat
     expose:
       - "15672"

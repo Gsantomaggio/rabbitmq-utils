@@ -4,7 +4,7 @@ This example shows how to use RabbitMQ TLS with external authentication.
 
 Run
 ==
-```
+```shell script
 ./build
 ```
 it generates the certs, import the key, and setup the docker compose with the right user
@@ -17,11 +17,20 @@ Enter keystore password:
 ```
 
 after that execute:
-```
+```shell script
 docker-compose up
 ```
 
-then the Java client:
+Then the Java client:
+
+```shell script
+
+ mvn package exec:java
+
+```
+
+**Expected Output**
+
 ```
 Connected!!!
 Received: Hello, World

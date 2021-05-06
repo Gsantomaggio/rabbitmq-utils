@@ -1,0 +1,19 @@
+version: '3'
+services:
+  rabbitmq_service:
+
+    hostname: 'rabbitmq-tls'
+    image: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: test
+      RABBITMQ_DEFAULT_PASS: test
+    expose:
+      - "15672"
+      -  "5672"
+    ports:
+      - "15672:15672"
+      - "5671:5671"
+    volumes:
+      - "./tls-gen/basic/result/:/cert"
+      - "./conf/:/etc/rabbitmq/"
+      - "./data/:/var/lib/rabbitmq/"

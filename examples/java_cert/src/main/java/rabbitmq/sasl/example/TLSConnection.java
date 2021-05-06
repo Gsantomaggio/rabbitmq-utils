@@ -1,4 +1,5 @@
-import com.google.rpc.Status;
+package rabbitmq.sasl.example;
+
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;

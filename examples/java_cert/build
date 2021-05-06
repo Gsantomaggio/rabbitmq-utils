@@ -13,4 +13,4 @@ val=$(openssl x509 -in tls-gen/basic/result/client_certificate.pem  -nameopt RFC
 echo $val
 sed  "s/REPLACE_WITH_USER_NAME/$val/g" docker-compose.template > docker-compose.yaml
 echo "docker-compose.yaml is ready"
-echo "docker compose up to run RabbitMQ"
+echo "docker-compose up to run RabbitMQ"

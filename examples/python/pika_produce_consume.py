@@ -47,7 +47,7 @@ class PyPikaTest:
 
     def thread_publish(self, rm):
         for i in range(1, 8):
-            qname = "training_queue_" + str(i)
+            qname = "test_queue_" + str(i)
             _thread.start_new_thread(self.publish, (rm, qname,))
             time.sleep(3)
             _thread.start_new_thread(self.start_consumers, (rm, qname,))

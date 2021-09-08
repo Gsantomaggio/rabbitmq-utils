@@ -30,3 +30,23 @@ rabbitmqctl list_channels name connection number consumer_count --no-table-heade
 #### filter channels with ZERO consumers
 rabbitmqctl list_channels name connection number consumer_count  --no-table-headers -q  |awk '$7 = 0 { printf "%s\t%s\n", $0,"" ; }'
 
+
+#################### DELETE/PURGE WARNING!!!! #############################
+### delete all the queues on the default vhost
+for q in $(rabbitmqctl list_queues name -s) ; do rabbitmqctl delete_queue $q; done
+
+### delete all the queues on the given a  vhost
+for q in $(rabbitmqctl list_queues name -s --vhost <<YOUR_VOST>>) ; do rabbitmqctl delete_queue --vhost  <<YOUR_VOST>> $q; done
+
+### delete all the queues on the given a  vhost
+for q in $(rabbitmqctl list_queues name -s --vhost <<YOUR_VOST>>) ; do rabbitmqctl delete_queue --vhost  <<YOUR_VOST>> $q; done
+
+### purge all the queues on the given a  vhost
+for q in $(rabbitmqctl list_queues name -s --vhost <<YOUR_VOST>>) ; do rabbitmqctl purge_queue --vhost  <<YOUR_VOST>> $q; done
+
+### purge all the queues in all vhost !!!!!
+for vh in $(rabbitmqctl list_vhosts -s); do  for q in $(rabbitmqctl list_queues name -s --vhost $vh) ; do rabbitmqctl purge_queue --vhost  $vh $q; done done
+
+
+### delete all the queues in all vhost !!!!!
+for vh in $(rabbitmqctl list_vhosts -s); do  for q in $(rabbitmqctl list_queues name -s --vhost $vh) ; do rabbitmqctl delete_queue --vhost  $vh $q; done done

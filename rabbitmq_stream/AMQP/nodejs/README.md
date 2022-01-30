@@ -1,0 +1,1 @@
+NodeJS Stream example with AMQP `amqplib` lib.

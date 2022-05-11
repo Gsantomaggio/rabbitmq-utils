@@ -28,28 +28,37 @@ class PyPikaTest:
 
     def publish(self, rm, qname):
         channel = self.get_connection(rm).channel()
-        channel.queue_declare(queue=qname, auto_delete=False)
-
         _properties = pika.BasicProperties(
             content_type='application/json',
-            content_encoding='utf-8'
+            content_encoding='utf-8',
+            delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
         )
         print("start: %s" % (time.ctime(time.time())))
-        for i in range(1, 900000):
-            time.sleep(5)
+        for i in range(1, 1000):
             channel.basic_publish(
                 exchange='',
                 routing_key=qname,
+                properties=_properties,
                 body='message: ' + str(i)
             )
         print("end: %s" % (time.ctime(time.time())))
 
     def thread_publish(self, rm):
-        for i in range(1, 8):
-            qname = "training_queue_" + str(i)
+        for i in range(1, 2):
+            qname = "quorum_" + str(i)
+            channel = self.get_connection(rm).channel()
+            channel.queue_declare(queue=qname, durable=True, arguments={"x-queue-type": "quorum"})
             _thread.start_new_thread(self.publish, (rm, qname,))
-            time.sleep(3)
-            _thread.start_new_thread(self.start_consumers, (rm, qname,))
+        for i in range(1, 2):
+            qname = "stream_" + str(i)
+            channel = self.get_connection(rm).channel()
+            channel.queue_declare(queue=qname, durable=True, arguments={"x-queue-type": "stream"})
+            _thread.start_new_thread(self.publish, (rm, qname,))
+        for i in range(1, 2):
+            qname = "classic_" + str(i)
+            channel = self.get_connection(rm).channel()
+            channel.queue_declare(queue=qname, durable=True, arguments={"x-queue-type": "classic"})
+            _thread.start_new_thread(self.publish, (rm, qname,))
 
 
 print('starting .. %s' % sys.argv[1])

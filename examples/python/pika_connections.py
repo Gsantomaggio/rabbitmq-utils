@@ -5,7 +5,6 @@ import sys
 import _thread
 
 
-
 class PyPikaTest:
 
     def pub(self, host, id):
@@ -26,23 +25,22 @@ class PyPikaTest:
                 content_type='application/json',
                 content_encoding='utf-8',
                 headers={'key': 'value'},
-                delivery_mode = 1,
+                delivery_mode=1,
             )
 
             for i in range(0, 10000):
                 channel.basic_publish(
-                        exchange='',
-                        routing_key=qname,
-                        properties=prop,
-                        body='{message: hello}'
-                    )
-                
+                    exchange='',
+                    routing_key=qname,
+                    properties=prop,
+                    body='{message: hello}'
+                )
 
     def thread_pub(self, rm):
         for i in range(0, 1):
             _thread.start_new_thread(self.pub, (rm, i,))
-        
-    
+
+
 print('starting .. %s' % sys.argv[1])
 time.sleep(1)
 x = PyPikaTest()

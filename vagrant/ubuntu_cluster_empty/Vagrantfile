@@ -1,0 +1,37 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+
+
+BOX_IMAGE = "ubuntu/bionic64"
+NODE_COUNT = 3 
+
+Vagrant.configure("2") do |config|
+  config.vm.define "node0" do |subconfig|
+    subconfig.vm.box = BOX_IMAGE
+    subconfig.vm.hostname = "node0"
+    subconfig.vm.network :private_network, ip: "192.168.56.10"
+ end
+  
+  (1..NODE_COUNT).each do |i|
+    config.vm.define "node#{i}" do |subconfig|
+      subconfig.vm.box = BOX_IMAGE
+      subconfig.vm.hostname = "node#{i}"
+      subconfig.vm.network :private_network, ip: "192.168.56.#{i + 10}"
+    end
+  end
+
+  # Install avahi on all machines  
+  config.vm.provision "shell", inline: <<-SHELL
+     sudo echo "192.168.56.11 node1 " >> /etc/hosts 
+     sudo echo "192.168.56.12 node2 " >> /etc/hosts 
+     sudo echo "192.168.56.10 node0 " >> /etc/hosts 
+     SHELL
+end
+
+
+

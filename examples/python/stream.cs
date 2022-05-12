@@ -1,13 +1,13 @@
  public async Task Start()
     {
         Console.WriteLine("Reliable .NET Producer");
-        var addressResolver = new AddressResolver(IPEndPoint.Parse("192.168.56.11:5552"));
+        // var addressResolver = new AddressResolver(IPEndPoint.Parse("192.168.56.11:5552"));
         var config = new StreamSystemConfig()
         {
-            AddressResolver = addressResolver,
-            UserName = "test",
-            Password = "test",
-            Endpoints = new List<EndPoint>() {addressResolver.EndPoint}
+            // AddressResolver = addressResolver,
+            // UserName = "test",
+            // Password = "test",
+            // Endpoints = new List<EndPoint>() {addressResolver.EndPoint}
         };
         const string stream = "my-reliable-stream";
         var system = await StreamSystem.Create(config);

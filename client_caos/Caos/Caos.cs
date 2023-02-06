@@ -8,8 +8,8 @@ public class Caos
 
         new ForceCloseTest("test-stream",args[0],args[1], args[2]).Start().Wait();
         Console.WriteLine("Test Force close Done");
-
-
+        
+        new CloseThreadsTest("test-stream",args[0],args[1], args[2]).Start().Wait();
         Console.WriteLine("Press any key to close");
         Console.ReadLine();
 

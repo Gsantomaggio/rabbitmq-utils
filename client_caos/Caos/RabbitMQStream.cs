@@ -78,6 +78,7 @@ public class RabbitMQStream
 
         return await Consumer.Create(new ConsumerConfig(_streamSystem, StreamName)
         {
+            OffsetSpec = new OffsetTypeFirst(),
             ClientProvidedName = consumerName,
             MessageHandler = messageHandler
         },consumerLogger);

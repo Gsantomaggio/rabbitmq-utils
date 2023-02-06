@@ -5,7 +5,7 @@ using RabbitMQ.Stream.Client.Reliable;
 
 namespace Caos;
 
-public class ForceCloseTest
+public class ForceCloseTest : TestBase
 {
     private class Connection
     {
@@ -96,11 +96,7 @@ public class ForceCloseTest
     }
 
 
-    private string username = "guest";
-    private string password = "guest";
-    private string host = "localhost";
-    private string streamName = "test-stream";
-    private RabbitMQStream _streamSystem;
+   
     public int MessagesSent { get; set; }
     public int MessagesConfirmed { get; set; }
     public int MessagesError { get; set; }

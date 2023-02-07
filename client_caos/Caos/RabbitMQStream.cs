@@ -12,7 +12,8 @@ public class RabbitMQStream
 
     public RabbitMQStream(string streamName, string username, string password, string host)
     {
-        AddressResolver addressResolver = new AddressResolver(new IPEndPoint(IPAddress.Parse(host), 5552));
+        // AddressResolver addressResolver = new AddressResolver(new IPEndPoint(IPAddress.Parse(host), 5552));
+        AddressResolver addressResolver = new AddressResolver(new DnsEndPoint(host, 5552));
 
         _streamSystem = StreamSystem.Create(new StreamSystemConfig
         {

@@ -1,7 +1,12 @@
 using System.Net;
+using System.Text;
 using System.Text.Json;
+using Amqp;
+using RabbitMQ.Client;
 using RabbitMQ.Stream.Client;
 using RabbitMQ.Stream.Client.Reliable;
+using ConnectionFactory = RabbitMQ.Client.ConnectionFactory;
+using Message = RabbitMQ.Stream.Client.Message;
 
 namespace Caos;
 
@@ -96,11 +101,69 @@ public class ForceCloseTest : TestBase
     }
 
 
-   
     public int MessagesSent { get; set; }
+    public int AMQPMessagesSent { get; set; }
+    public int AMQP10MessagesSent { get; set; }
     public int MessagesConfirmed { get; set; }
     public int MessagesError { get; set; }
     public int MessagesConsumed { get; set; }
+
+
+    private async Task FromAMQPLiteProducer()
+    {
+        var address = new Address($"amqp://{username}:{password}@{host}:5672");
+        var connection = new Amqp.Connection(address);
+        var session = new Session(connection);
+        var sender = new SenderLink(session, "mixing", $"/amq/queue/{streamName}");
+
+        for (int i = 0; i < 120000; i++)
+        {
+            var message = new Amqp.Message(new byte[new Random().Next(100, 4000)]);
+            message.Properties = new Amqp.Framing.Properties()
+            {
+                MessageId = "1",
+                Subject = "test",
+                ContentType = "text/plain"
+            };
+            message.ApplicationProperties = new Amqp.Framing.ApplicationProperties()
+            {
+                Map = {{"key1", "value1"}, {"key2", 2}}
+            };
+
+            await sender.SendAsync(message);
+            AMQP10MessagesSent += 1;
+        }
+    }
+
+    private void AMQPProducer()
+    {
+        var factory = new ConnectionFactory()
+        {
+            Password = password,
+            UserName = username,
+            HostName = host,
+        };
+        using var connection = factory.CreateConnection();
+        var channel = connection.CreateModel();
+
+        for (var i = 0; i < 2200000; i++)
+        {
+            var properties = channel.CreateBasicProperties();
+
+            properties.MessageId = "年 6 月";
+            properties.CorrelationId = "10000_00000";
+            properties.ContentType = "text/plain";
+            properties.ContentEncoding = "utf-8";
+            properties.Headers = new Dictionary<string, object>()
+            {
+                {"stream_key", "stream_value"}, {"stream_key4", "Alan Mathison Turing（1912 年 6 月 23 日"},
+            };
+            channel.BasicPublish("", streamName, properties, new byte[new Random().Next(100, 4000)]);
+            AMQPMessagesSent++;
+            Thread.Sleep(new Random().Next(1,10));
+            
+        }
+    }
 
 
     public ForceCloseTest(string streamName, string username, string password, string host)
@@ -114,32 +177,24 @@ public class ForceCloseTest : TestBase
 
     public async Task Start()
     {
-        _ = Task.Run(async () =>
-        {
-            for (var i = 0; i < 4; i++)
-            {
-                await Task.Delay(new Random().Next(5000, 20000));
-                Console.WriteLine("Killing connections producer");
-                await HttpKillConnections("producer-caos-force-test");
-                await Task.Delay(new Random().Next(3000, 4000));
-                Console.WriteLine("Killing connections consumer");
-                await HttpKillConnections("consumer-caos-force-test");
-            }
-
-            Console.WriteLine("Kill Done");
-        });
-
+        await _streamSystem.DeleteStream();
+        await _streamSystem.CreateStream();
+        _ = Task.Run(AMQPProducer);
+        _ = Task.Run(FromAMQPLiteProducer);
         _ = Task.Run(() =>
         {
             var count = 0;
             while (count < 2)
-            {Thread.Sleep(2000);
+            {
+                Thread.Sleep(2000);
                 while (MessagesSent != MessagesError + MessagesConfirmed && MessagesConsumed != HttpGetQMsgCount())
                 {
                     Console.WriteLine($"Messages sent: {MessagesSent} -" +
                                       $"Messages confirmed: {MessagesConfirmed} - " +
                                       $"Messages error: {MessagesError} - Total {MessagesError + MessagesConfirmed}  " +
-                                      $"Messages consumed: {MessagesConsumed}");
+                                      $"Messages consumed: {MessagesConsumed} " +
+                                      $"AMQP10MessagesSent: {AMQP10MessagesSent} " +
+                                      $"AMQPMessagesSent: {AMQPMessagesSent}");
                     Thread.Sleep(2000);
                     count++;
                 }
@@ -154,8 +209,25 @@ public class ForceCloseTest : TestBase
             Console.WriteLine("");
             Console.WriteLine("********************************************************************************");
         });
-        await _streamSystem.DeleteStream();
-        await _streamSystem.CreateStream();
+        
+        
+        _ = Task.Run(async () =>
+        {
+            for (var i = 0; i < 4; i++)
+            {
+                await Task.Delay(new Random().Next(15000, 30000));
+                Console.WriteLine("Killing connections producer");
+                await HttpKillConnections("producer-caos-force-test");
+                await Task.Delay(new Random().Next(13000, 14000));
+                Console.WriteLine("Killing connections consumer");
+                await HttpKillConnections("consumer-caos-force-test");
+            }
+
+            Console.WriteLine("Kill Done");
+        });
+
+      
+   
         var producer = await _streamSystem.CreateProducer("producer-caos-force-test",
             new Func<MessagesConfirmation, Task>(
                 async confirmation =>
@@ -178,12 +250,17 @@ public class ForceCloseTest : TestBase
                 async (s, rawConsumer, messageContext, message) =>
                 {
                     MessagesConsumed += 1;
+                    if (message.Size <= 0)
+                    {
+                        throw new Exception("Message size is 0");
+                    }
+
                     await Task.CompletedTask;
                 }
             ));
 
         var l = new List<Message>();
-        for (var i = 1; i <= 500_000; i++)
+        for (var i = 1; i <= 1_500_000; i++)
         {
             var msg = new Message(new byte[new Random().Next(10, 4096)]);
             await producer.Send(msg);

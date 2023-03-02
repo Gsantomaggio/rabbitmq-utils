@@ -143,6 +143,7 @@ public class ForceCloseTest : TestBase
             UserName = username,
             HostName = host,
         };
+
         using var connection = factory.CreateConnection();
         var channel = connection.CreateModel();
 
@@ -160,8 +161,7 @@ public class ForceCloseTest : TestBase
             };
             channel.BasicPublish("", streamName, properties, new byte[new Random().Next(100, 4000)]);
             AMQPMessagesSent++;
-            Thread.Sleep(new Random().Next(1,10));
-            
+            Thread.Sleep(new Random().Next(1, 10));
         }
     }
 
@@ -175,19 +175,19 @@ public class ForceCloseTest : TestBase
         this.host = host;
     }
 
-    public async Task Start()
+    public async Task Start(int totalMessages)
     {
         await _streamSystem.DeleteStream();
         await _streamSystem.CreateStream();
-        _ = Task.Run(AMQPProducer);
-        _ = Task.Run(FromAMQPLiteProducer);
+        // _ = Task.Run(AMQPProducer);
+        // _ = Task.Run(FromAMQPLiteProducer);
         _ = Task.Run(() =>
         {
             var count = 0;
             while (count < 2)
             {
                 Thread.Sleep(2000);
-                while (MessagesSent != MessagesError + MessagesConfirmed && MessagesConsumed != HttpGetQMsgCount())
+                while (MessagesSent != totalMessages && MessagesConsumed != HttpGetQMsgCount())
                 {
                     Console.WriteLine($"Messages sent: {MessagesSent} -" +
                                       $"Messages confirmed: {MessagesConfirmed} - " +
@@ -209,25 +209,24 @@ public class ForceCloseTest : TestBase
             Console.WriteLine("");
             Console.WriteLine("********************************************************************************");
         });
-        
-        
+
+
         _ = Task.Run(async () =>
         {
             for (var i = 0; i < 4; i++)
             {
-                await Task.Delay(new Random().Next(15000, 30000));
-                Console.WriteLine("Killing connections producer");
-                await HttpKillConnections("producer-caos-force-test");
-                await Task.Delay(new Random().Next(13000, 14000));
-                Console.WriteLine("Killing connections consumer");
-                await HttpKillConnections("consumer-caos-force-test");
+                await Task.Delay(new Random().Next(15000, 25000));
+                var x = await HttpKillConnections("producer-caos-force-test");
+                Console.WriteLine("Killed {x}  producer connections ");
+                await Task.Delay(new Random().Next(1000, 3000));
+                var y = await HttpKillConnections("consumer-caos-force-test");
+                Console.WriteLine("Killed  {y} consumer connections ");
             }
 
             Console.WriteLine("Kill Done");
         });
 
-      
-   
+
         var producer = await _streamSystem.CreateProducer("producer-caos-force-test",
             new Func<MessagesConfirmation, Task>(
                 async confirmation =>
@@ -245,6 +244,8 @@ public class ForceCloseTest : TestBase
                 }
             ));
 
+       
+
         var consumer = await _streamSystem.CreateConsumer("consumer-caos-force-test",
             new Func<string, RawConsumer, MessageContext, Message, Task>(
                 async (s, rawConsumer, messageContext, message) =>
@@ -260,7 +261,7 @@ public class ForceCloseTest : TestBase
             ));
 
         var l = new List<Message>();
-        for (var i = 1; i <= 1_500_000; i++)
+        for (var i = 1; i <= totalMessages; i++)
         {
             var msg = new Message(new byte[new Random().Next(10, 4096)]);
             await producer.Send(msg);

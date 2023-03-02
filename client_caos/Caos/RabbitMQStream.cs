@@ -12,8 +12,8 @@ public class RabbitMQStream
 
     public RabbitMQStream(string streamName, string username, string password, string host)
     {
-        // AddressResolver addressResolver = new AddressResolver(new IPEndPoint(IPAddress.Parse(host), 5552));
-        AddressResolver addressResolver = new AddressResolver(new DnsEndPoint(host, 5552));
+        AddressResolver addressResolver = new AddressResolver(new IPEndPoint(IPAddress.Parse(host), 5552));
+        // AddressResolver addressResolver = new AddressResolver(new DnsEndPoint(host, 5552));
 
         _streamSystem = StreamSystem.Create(new StreamSystemConfig
         {
@@ -32,7 +32,7 @@ public class RabbitMQStream
     {
         await _streamSystem.CreateStream(new StreamSpec(StreamName)
         {
-            MaxLengthBytes = 10_737_418_240
+            MaxLengthBytes = 18_250_418_240,
         });
     }
 
@@ -58,12 +58,54 @@ public class RabbitMQStream
         });
 
         var producerLogger = loggerFactory.CreateLogger<Producer>();
-        
+
         return await Producer.Create(new ProducerConfig(_streamSystem, StreamName)
         {
             ClientProvidedName = producerName,
             ConfirmationHandler = confirmationHandler
         }, producerLogger);
+    }
+
+
+    public async Task<Producer> CreateSuperProducer(string producerName,
+        Func<MessagesConfirmation, Task> confirmationHandler)
+    {
+        var loggerFactory = LoggerFactory.Create(builder =>
+        {
+            builder.AddSimpleConsole();
+            builder.AddFilter("RabbitMQ.Stream", LogLevel.Information);
+        });
+
+        var producerLogger = loggerFactory.CreateLogger<Producer>();
+
+        return await Producer.Create(new ProducerConfig(_streamSystem, "invoices")
+        {
+            SuperStreamConfig = new SuperStreamConfig()
+            {
+                Routing = msg => msg.Properties.MessageId.ToString()
+            },
+            ClientProvidedName = producerName,
+            ConfirmationHandler = confirmationHandler
+        }, producerLogger);
+    }
+
+    public async Task<DeduplicatingProducer> CreateDeduplicationProducer(string producerName,
+        Func<MessagesConfirmation, Task> confirmationHandler)
+    {
+        var loggerFactory = LoggerFactory.Create(builder =>
+        {
+            builder.AddSimpleConsole();
+            builder.AddFilter("RabbitMQ.Stream", LogLevel.Debug);
+        });
+
+        var producerLogger = loggerFactory.CreateLogger<Producer>();
+
+        return await DeduplicatingProducer.Create(
+            new DeduplicatingProducerConfig(_streamSystem, StreamName, "reference")
+            {
+                ClientProvidedName = producerName,
+                ConfirmationHandler = confirmationHandler
+            }, producerLogger);
     }
 
     public async Task<Consumer> CreateConsumer(string consumerName,
@@ -82,6 +124,36 @@ public class RabbitMQStream
             OffsetSpec = new OffsetTypeFirst(),
             ClientProvidedName = consumerName,
             MessageHandler = messageHandler
-        },consumerLogger);
+        }, consumerLogger);
+    }
+
+
+    public async Task<Consumer> CreateSuperConsumer(string consumerName,
+        Func<string, RawConsumer, MessageContext, Message, Task> messageHandler)
+    {
+        var loggerFactory = LoggerFactory.Create(builder =>
+        {
+            builder.AddSimpleConsole();
+            builder.AddFilter("RabbitMQ.Stream", LogLevel.Information);
+        });
+
+        var consumerLogger = loggerFactory.CreateLogger<Consumer>();
+
+        return await Consumer.Create(new ConsumerConfig(_streamSystem, "invoices")
+        {
+            Reference = "reference",
+            IsSuperStream = true,
+            IsSingleActiveConsumer = true,
+            ConsumerUpdateListener = async (reference, stream, isActive) =>
+            {
+                consumerLogger.LogInformation("Consumer {S1}, for stream {Stream} is active {S2} ", stream, reference,
+                    isActive);
+                await Task.CompletedTask.ConfigureAwait(false);
+                return new OffsetTypeFirst();
+            },
+            OffsetSpec = new OffsetTypeFirst(),
+            ClientProvidedName = consumerName,
+            MessageHandler = messageHandler
+        }, consumerLogger);
     }
 }

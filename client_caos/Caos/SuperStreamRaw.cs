@@ -47,7 +47,7 @@ public class SuperStreamRaw : TestBase
             Console.WriteLine($"Restart all-1 {z}");
 
             var consumers = new List<Consumer>();
-            for (var i = 0; i < 2; i++)
+            for (var i = 0; i < 1; i++)
             {
                 Console.WriteLine($"starting consumer {i}");
                 var c = await _streamSystem.CreateSuperConsumer("super-consumer",

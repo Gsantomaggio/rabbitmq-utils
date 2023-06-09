@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployments-caos
+  namespace: stream-clients-test
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: deployments-caos
+  template:
+    metadata:
+      labels:
+        app: deployments-caos
+    spec:
+      containers:
+        - name: caos
+          image: gsantomaggio/caos

@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using RabbitMQ.Stream.Client;
 using RabbitMQ.Stream.Client.AMQP;
 using RabbitMQ.Stream.Client.Reliable;
@@ -21,11 +22,12 @@ public class SuperStreamRaw : TestBase
             new Func<MessagesConfirmation, Task>(
                 async confirmation => { await Task.CompletedTask; }
             ));
-
+        
         _ = Task.Run(async () =>
         {
             for (int i = 0; i < 100_000_0000; i++)
             {
+                if (!producer.IsOpen()) break;
                 await producer.Send(new Message(new byte[100])
                 {
                     Properties = new Properties
@@ -33,39 +35,56 @@ public class SuperStreamRaw : TestBase
                         MessageId = i.ToString()
                     }
                 });
-                await Task.Delay(2);
+                await Task.Delay(1);
             }
 
-            // _ = Task.Run(async () =>
-
-
-            // );
+           
         });
         await Task.Delay(2000);
-        for (var z = 0; z < 50; z++)
+        for (var z = 0; z < 15509; z++)
         {
             Console.WriteLine($"Restart all-1 {z}");
 
             var consumers = new List<Consumer>();
-            for (var i = 0; i < 1; i++)
+            var consumedDictionary = new ConcurrentDictionary<string, int>();
+            // for (var i = 0; i < 1; i++)
             {
-                Console.WriteLine($"starting consumer {i}");
+                Console.WriteLine($"starting consumer");
+                // await Task.Delay(new Random().Next(100, 3000));
                 var c = await _streamSystem.CreateSuperConsumer("super-consumer",
-                    async (s, consumer, arg3, arg4) =>
+                    async (stream, consumer, arg3, arg4) =>
                     {
-                        await Task.Delay(new Random().Next(1000, 5000));
+                        // await Task.Delay(new Random().Next(1000, 5000));
+                        // Console.WriteLine($"****************--++Before Message received: {stream} {DateTime.Now}");
+                        var random = new Random();
+                        await Task.Delay(random.Next(200, 1000));
+                        if (!consumedDictionary.ContainsKey(stream))
+                        {
+                            consumedDictionary.TryAdd(stream, 0);
+                        }
+
+                        consumedDictionary.TryUpdate(stream, consumedDictionary[stream] + 1,
+                            consumedDictionary[stream]);
+                        // Console.WriteLine(
+                        //     $"****************--++After Message received: {stream} elapsed:  {DateTime.Now - start} offset {arg3.Offset}");
+                        consumedDictionary.TryGetValue(stream, out var val);
+                        if (val % 10 == 0)
+                        {
+                            Console.WriteLine(
+                                $"__Message received: {stream} offset {arg3.Offset} {DateTime.Now}");
+                        }
+
                         await Task.CompletedTask;
                     }
-
                 );
                 consumers.Add(c);
             }
 
-            await Task.Delay(95000);
+            await Task.Delay(90000 * 1);
             foreach (var consumer in consumers)
             {
                 Console.WriteLine($"closing consumers...");
-                await Task.Delay(2000);
+                await Task.Delay(1000);
                 await consumer.Close();
             }
 

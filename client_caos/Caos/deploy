@@ -1,0 +1,6 @@
+dotnet build --configuration Release --no-restore
+docker build -t caos .
+docker tag caos  gsantomaggio/caos
+docker push gsantomaggio/caos
+kubectl delete  -f   deploy.yaml || true
+kubectl apply  -f   deploy.yaml 

@@ -9,11 +9,11 @@ public class RabbitMQStream
 {
     public string StreamName { get; set; }
     private StreamSystem _streamSystem;
+    private string superStream = "invoices";
 
     public RabbitMQStream(string streamName, string username, string password, string host)
     {
-        AddressResolver addressResolver = new AddressResolver(new IPEndPoint(IPAddress.Parse(host), 5552));
-        // AddressResolver addressResolver = new AddressResolver(new DnsEndPoint(host, 5552));
+        var addressResolver = new AddressResolver(new IPEndPoint(IPAddress.Parse(host), 5552));
 
         _streamSystem = StreamSystem.Create(new StreamSystemConfig
         {
@@ -30,6 +30,7 @@ public class RabbitMQStream
 
     public async Task CreateStream()
     {
+        Console.WriteLine($"Creating stream {StreamName}");
         await _streamSystem.CreateStream(new StreamSpec(StreamName)
         {
             MaxLengthBytes = 18_250_418_240,
@@ -58,7 +59,7 @@ public class RabbitMQStream
         });
 
         var producerLogger = loggerFactory.CreateLogger<Producer>();
-
+        Console.WriteLine($"Creating Producer {StreamName}");
         return await Producer.Create(new ProducerConfig(_streamSystem, StreamName)
         {
             ClientProvidedName = producerName,
@@ -73,12 +74,12 @@ public class RabbitMQStream
         var loggerFactory = LoggerFactory.Create(builder =>
         {
             builder.AddSimpleConsole();
-            builder.AddFilter("RabbitMQ.Stream", LogLevel.Information);
+            builder.AddFilter("RabbitMQ.Stream", LogLevel.Debug);
         });
 
         var producerLogger = loggerFactory.CreateLogger<Producer>();
 
-        return await Producer.Create(new ProducerConfig(_streamSystem, "invoices")
+        return await Producer.Create(new ProducerConfig(_streamSystem, superStream)
         {
             SuperStreamConfig = new SuperStreamConfig()
             {
@@ -134,16 +135,21 @@ public class RabbitMQStream
         var loggerFactory = LoggerFactory.Create(builder =>
         {
             builder.AddSimpleConsole();
-            builder.AddFilter("RabbitMQ.Stream", LogLevel.Information);
+            builder.AddFilter("RabbitMQ.Stream", LogLevel.Debug);
         });
 
         var consumerLogger = loggerFactory.CreateLogger<Consumer>();
 
-        return await Consumer.Create(new ConsumerConfig(_streamSystem, "invoices")
+        return await Consumer.Create(new ConsumerConfig(_streamSystem, superStream)
         {
+            
             Reference = "reference",
             IsSuperStream = true,
             IsSingleActiveConsumer = true,
+            
+            //
+            
+            
             ConsumerUpdateListener = async (reference, stream, isActive) =>
             {
                 consumerLogger.LogInformation("Consumer {S1}, for stream {Stream} is active {S2} ", stream, reference,

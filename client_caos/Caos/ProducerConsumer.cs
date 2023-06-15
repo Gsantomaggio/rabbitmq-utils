@@ -51,21 +51,25 @@ public class ProducerConsumer : TestBase
             }));
 
 
-        var consumer = await _streamSystem.CreateConsumer("consumer-caos-force-test",
-            new Func<string, RawConsumer, MessageContext, Message, Task>(
-                async (s, rawConsumer, messageContext, message) =>
-                {
-                    MessagesConsumed += 1;
-                    await Task.CompletedTask;
-                }
-            ));
+        for (int i = 0; i < 10; i++)
+        {
+            var consumer = _streamSystem.CreateConsumer("consumer-caos-force-test",
+                new Func<string, RawConsumer, MessageContext, Message, Task>(
+                    async (s, rawConsumer, messageContext, message) =>
+                    {
+                        MessagesConsumed += 1;
+                        await Task.CompletedTask;
+                    }
+                ));
+            await Task.WhenAll(consumer);
+        }
 
 
         for (ulong i = 0; i < messagesToSend; i++)
         {
             await d.Send(new Message(new byte[100]));
             MessagesSent++;
-            await Task.Delay(1500);
+            await Task.Delay(100);
         }
     }
 

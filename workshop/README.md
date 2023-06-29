@@ -1,6 +1,11 @@
 What I need for the workshop
 
 
+Telegram Channel:
+====
+https://t.me/+GzBO0DlyJcozZDlk
+
+
 
 RabbitMQ
 =====

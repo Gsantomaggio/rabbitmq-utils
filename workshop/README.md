@@ -26,6 +26,11 @@ enable the right plugins
 ```
 
 
+RabbitMQ stream Protocol
+===
+https://github.com/rabbitmq/rabbitmq-server/blob/v3.11.x/deps/rabbitmq_stream/docs/PROTOCOL.adoc#create
+
+
 
 Envoy
 ====
@@ -44,6 +49,12 @@ Peek one of these:
 - Java https://github.com/rabbitmq/rabbitmq-stream-java-client
 - Rust https://github.com/rabbitmq/rabbitmq-stream-rust-client
 - Python https://github.com/qweeze/rstream
+
+
+Envoy SDKs
+====
+https://github.com/proxy-wasm/proxy-wasm-rust-sdk/
+
 
 
 

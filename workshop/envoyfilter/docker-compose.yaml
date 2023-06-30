@@ -1,0 +1,37 @@
+version: '2'
+services:
+
+  proxy:
+    build:
+      context: ./envoy
+      dockerfile: Dockerfile.proxy
+    volumes:
+      - ./envoy/envoy_tcp.yaml:/etc/envoy_tcp.yaml
+      - ./target/wasm32-unknown-unknown/release/rabbitmq_http_filter.wasm:/etc/rabbitmq_http_filter.wasm
+      - ./target/wasm32-unknown-unknown/release/rabbitmq_network_filter.wasm:/etc/rabbitmq_network_filter.wasm
+    networks:
+      - envoymesh
+    expose:
+      - "5673"
+      - "15673"
+      - "8001"
+    ports:
+      - "5673:5673"
+      - "15673:15673"
+      - "8001:8001"
+
+  rabbitmq_service:
+    image: rabbitmq:management
+    networks:
+      envoymesh:
+        aliases:
+          - rabbitmq_service
+    expose:
+      - "15672"
+      -  "5672"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+networks:
+  envoymesh: {}

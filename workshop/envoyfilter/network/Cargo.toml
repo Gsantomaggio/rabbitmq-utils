@@ -1,0 +1,16 @@
+[package]
+name = "stream_filter"
+version = "0.1.0"
+authors = ["Gabriele Santomaggio <gsantomaggio@vmware.com>"]
+edition = "2021"
+
+[lib]
+name = "stream_filter"
+crate-type = ["cdylib"]
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+#proxy-wasm = "0.1.4"
+proxy-wasm = "0.2.1"
+log = "0.4"
+byteorder = "1"

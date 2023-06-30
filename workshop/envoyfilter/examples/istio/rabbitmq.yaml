@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: wasm-disk
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: standard
+---
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: filter
+spec:
+#  skipPostDeploySteps: false
+  replicas: 1
+  # tls:
+  #   secretName: rabbitmq-bugs-tls
+  resources:
+    requests:
+      cpu: 2
+      memory: 2Gi
+    limits:
+      cpu: 2
+      memory: 2Gi
+  rabbitmq:
+    additionalConfig: |
+      vm_memory_high_watermark.relative = 0.7
+      # proxy_protocol = true
+  override:
+    statefulSet:
+      spec:
+        template:
+          metadata:
+            annotations:
+              # sidecar.istio.io/interceptionMode: TPROXY
+              sidecar.istio.io/userVolumeMount: '[{"name": "rabbitmq-filter", "mountPath": "/var/local/wasm-filters/"}]'
+              sidecar.istio.io/userVolume: '[{"name": "rabbitmq-filter", "PersistentVolumeClaim": {"claimName": "wasm-disk"}}]'

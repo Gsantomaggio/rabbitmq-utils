@@ -1,0 +1,101 @@
+# enable filter logs curl -X POST localhost:15000/logging?wasm=info
+# global --set global.logging.level=default:info,wasm:info
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: rabbitmq-env-filter
+spec:
+  configPatches:
+    - applyTo: NETWORK_FILTER
+      match:
+        context: SIDECAR_INBOUND
+        proxy:
+          proxyVersion: '1\.8.*'
+        listener:
+          portNumber: 5672
+          filterChain:
+            filter:
+              name: envoy.filters.network.tcp_proxy
+      patch:
+        operation: INSERT_BEFORE
+        value:
+          name: envoy.filters.network.wasm
+          typed_config:
+            "@type": type.googleapis.com/envoy.extensions.filters.network.wasm.v3.Wasm
+            config:
+              name: rabbitmq.filters.network.network
+              rootId: rabbitmq.filters.network.network
+              vmConfig:
+                code:
+                  local:
+                    filename: /var/local/wasm-filters/rabbitmq_network_filter.wasm
+                runtime: envoy.wasm.runtime.v8
+                vmId: rabbitmq.filters.network.network
+                allow_precompiled: true
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: rabbitmq-bufferlimit
+spec:
+  configPatches:
+  - applyTo: LISTENER
+    ListenerMatch: 0.0.0.0_5672
+    patch:
+      operation: MERGE
+      value:
+        per_connection_buffer_limit_bytes: 4096
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: rabbitmq-env-filter-http
+spec:
+  configPatches:
+    - applyTo: HTTP_FILTER
+      match:
+        context: ANY
+        proxy:
+          proxyVersion: '1\.8.*'
+        listener:
+          portNumber: 15672
+          filterChain:
+            filter:
+              name: envoy.http_connection_manager
+              subFilter:
+                name: envoy.router
+      patch:
+        operation: INSERT_BEFORE
+        value:
+          typed_config:
+            "@type": type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
+            config:
+              name: rabbitmq.filters.http.network
+              rootId: rabbitmq.filters.http.network
+              vmConfig:
+                code:
+                  local:
+                    filename: /var/local/wasm-filters/rabbitmq_http_filter.wasm
+                runtime: envoy.wasm.runtime.v8
+                vmId: rabbitmq.filters.http.network
+                allow_precompiled: true
+          name: envoy.filters.http.wasm
+# ---
+# apiVersion: networking.istio.io/v1alpha3
+# kind: EnvoyFilter
+# metadata:
+#   name: rabbitmq-original-src
+# spec:
+#   configPatches:
+#   - applyTo: LISTENER
+#     match:
+#       context: SIDECAR_INBOUND
+#       listener:
+#         portNumber: 5672
+#     patch:
+#       operation: MERGE
+#       value:
+#         listenerFilters:
+#         - name: envoy.listener.original_src
+#           config:
+#             mark: 133

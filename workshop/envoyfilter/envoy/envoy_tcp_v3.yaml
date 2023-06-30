@@ -1,0 +1,48 @@
+admin: {"accessLogPath":"/dev/null","address":{"socketAddress":{"address":"127.0.0.1","portValue":9901}}}
+
+static_resources:
+  listeners:
+    - name: ingress
+      per_connection_buffer_limit_bytes:  4096
+      address:
+        socket_address:
+          address: 0.0.0.0
+          port_value: 5553
+      filter_chains:
+        - filters:
+            - name: envoy.filters.network.wasm
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.network.wasm.v3.Wasm
+                config:
+                  configuration: {"@type":"type.googleapis.com/google.protobuf.StringValue",
+                                  "value":""}
+                  name: "rmq"
+                  root_id: "filter"
+                  vm_config:
+                    vm_id: "1"
+                    runtime: envoy.wasm.runtime.v8
+                    code: {"local":{"filename":"target/wasm32-unknown-unknown/release/stream_filter.wasm"}}
+                    allow_precompiled: true
+
+                    
+            - name: envoy.filters.network.tcp_proxy
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy
+                stat_prefix: ingress
+                cluster: stream
+
+  clusters:
+    - name: stream
+      connect_timeout: 3.25s
+      per_connection_buffer_limit_bytes:  4096
+      type: LOGICAL_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: stream
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: 127.0.0.1
+                      port_value: 5552

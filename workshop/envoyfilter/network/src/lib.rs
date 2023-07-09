@@ -107,14 +107,14 @@ impl StreamContext for StreamingAuthorizer {
     fn on_downstream_data(&mut self, data_size: usize, end_of_stream: bool) -> Action {
         if let Some(data) = self.get_downstream_data(0, data_size) {
             let tou8: &[u8] = &data;
-            info!("Stream traffic-raw {:?}", tou8);
-            // Self::parse(&tou8);
-            // let version = byteorder::BigEndian::read_u16(&tou8[6..]);
-            // if version ==1 {
-            //     error!("\x1b[0;31m Drop connection: VERSION {:?} not allowed \x1b[0m",
-            //     version);
-            //  return Action::Pause;
-            // }
+            // info!("Stream traffic-raw {:?}", tou8);
+            Self::parse(&tou8);
+            let version = byteorder::BigEndian::read_u16(&tou8[6..]);
+            if version ==1 {
+                error!("\x1b[0;31m Drop connection: VERSION {:?} not allowed \x1b[0m",
+                version);
+             return Action::Pause;
+            }
        
         }
         return Action::Continue;

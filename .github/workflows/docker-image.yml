@@ -42,5 +42,7 @@ jobs:
         run: |
           docker load --input /tmp/myimage.tar
           docker image ls -a
-          docker exec myimage:latest rabbitmq-plugins enable rabbitmq_stream_management rabbitmq_amqp1_0
+          # docker exec myimage:latest rabbitmq-plugins enable rabbitmq_stream_management rabbitmq_amqp1_0
+          docker exec node:14 ls
+
         

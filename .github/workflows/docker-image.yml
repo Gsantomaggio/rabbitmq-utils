@@ -48,7 +48,8 @@ jobs:
           myimage
       - name: wait for running 
         run: |
-          docker exec rabbitmq-stream-client-test /bin/bash -c 'rabbitmqctl wait --pid 1 --timeout 60'
+          docker exec rabbitmq-stream-client-test /bin/bash -c 'ps -aux'
+          docker exec rabbitmq-stream-client-test /bin/bash -c 'rabbitmqctl wait --pid 1 --timeout 80'
 
 
 
